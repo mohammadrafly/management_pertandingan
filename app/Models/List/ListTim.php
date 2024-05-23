@@ -2,6 +2,7 @@
 
 namespace App\Models\List;
 
+use App\Models\Atlet;
 use App\Models\Kelas;
 use App\Models\Tim;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -15,12 +16,17 @@ class ListTim extends Model
 
     protected $guarded = [];
 
-    public function Tim()
+    public function tim()
     {
         return $this->belongsTo(Tim::class, 'tim_id', 'id');
     }
 
-    public function Kelas()
+    public function atlet()
+    {
+        return $this->belongsTo(Atlet::class, 'atlet_id', 'id');
+    }
+
+    public function kelas()
     {
         return $this->belongsTo(Kelas::class, 'kelas_id', 'id');
     }

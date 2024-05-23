@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Dashboard;
 use App\Http\Controllers\Controller;
 use App\Models\Kelas;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class KelasController extends Controller
@@ -34,15 +35,16 @@ class KelasController extends Controller
             if ($validator->fails()) {
                 return redirect()->back()->withErrors($validator)->withInput();
             }
-    
-            if ($request->hasFile('img')) {
-                $img = $request->file('img');
-                $imgName = time() . '_' . $img->getClientOriginalName();
-                $img->storeAs('kelas', $imgName, 'public');
-                $data['img'] = $imgName;
-            }
 
             $data = $validator->validated();
+            
+            if ($request->hasFile('img')) {
+                $img = $request->file('img');
+                $imgExtension = $img->getClientOriginalExtension();
+                $imgName = time() . '_thumbnail.' . $imgExtension;
+                $img->storeAs('thumbnail_kelas', $imgName, 'public');
+                $data['img'] = $imgName;
+            }
     
             if (Kelas::create($data)) {
                 return redirect()->route('kelas')->with('success', 'Berhasil menambahkan kelas');
@@ -75,15 +77,15 @@ class KelasController extends Controller
                 return redirect()->back()->withErrors($validator)->withInput();
             }
 
-            if ($request->hasFile('img')) {
-                $img = $request->file('img');
-                $imgName = time() . '_' . $img->getClientOriginalName();
-                $img->storeAs('kelas', $imgName, 'public');
-                $data['img'] = $imgName;
-            }
-
             $data = $validator->validated();
 
+            if ($request->hasFile('img')) {
+                $thumbnailKelas = $request->file('img');
+                $thumbnailKelasName = time() . '_kelas';
+                $thumbnailKelas->storeAs('thumbnail_kelas', $thumbnailKelasName, 'public');
+                $data['img'] = $thumbnailKelasName;
+            }
+    
             if ($kelas->update($data)) {
                 return redirect()->route('kelas')->with('success', 'Berhasil update kelas');
             } else {
@@ -101,7 +103,20 @@ class KelasController extends Controller
     {
         $kelas = Kelas::find($id);
 
-        if (!$kelas->delete()){
+        if (!$kelas) {
+            return redirect()->route('kelas')->with('error', 'Kelas not found!');
+        }
+
+        $imagePath = $kelas->img;
+
+        if ($imagePath) {
+            $fullImagePath = storage_path('app/public/thumbnail_kelas/' . $imagePath);
+            if (file_exists($fullImagePath)) {
+                unlink($fullImagePath);
+            }
+        }
+
+        if (!$kelas->delete()) {
             return redirect()->route('kelas')->with('error', 'Gagal delete kelas!');
         }
 

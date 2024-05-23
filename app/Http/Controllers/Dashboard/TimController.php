@@ -40,17 +40,19 @@ class TimController extends Controller
     
             if ($request->hasFile('foto')) {
                 $foto = $request->file('foto');
-                $fotoName = time() . '_' . $foto->getClientOriginalName();
-                $foto->storeAs('fotos', $fotoName, 'public');
+                $fotoExtension = $foto->getClientOriginalExtension();
+                $fotoName = time() . '_foto.' . $fotoExtension;
+                $foto->storeAs('foto_tim', $fotoName, 'public');
                 $data['foto'] = $fotoName;
             }
-    
+            
             if ($request->hasFile('surat_tugas')) {
                 $suratTugas = $request->file('surat_tugas');
-                $suratTugasName = time() . '_' . $suratTugas->getClientOriginalName();
+                $suratTugasExtension = $suratTugas->getClientOriginalExtension();
+                $suratTugasName = time() . '_surat.' . $suratTugasExtension;
                 $suratTugas->storeAs('surat_tugas', $suratTugasName, 'public');
                 $data['surat_tugas'] = $suratTugasName;
-            }
+            }            
             
             if (!Tim::create($data)) {
                 return redirect()->route('tim')->with('error', 'Gagal menambahkan tim');
@@ -85,20 +87,21 @@ class TimController extends Controller
             }
     
             $data = $validator->validated();
-
             if ($request->hasFile('foto')) {
                 $foto = $request->file('foto');
-                $fotoName = time() . '_' . $foto->getClientOriginalName();
-                $foto->storeAs('fotos', $fotoName, 'public');
+                $fotoExtension = $foto->getClientOriginalExtension();
+                $fotoName = time() . '_foto.' . $fotoExtension;
+                $foto->storeAs('foto_tim', $fotoName, 'public');
                 $data['foto'] = $fotoName;
             }
-    
+            
             if ($request->hasFile('surat_tugas')) {
                 $suratTugas = $request->file('surat_tugas');
-                $suratTugasName = time() . '_' . $suratTugas->getClientOriginalName();
+                $suratTugasExtension = $suratTugas->getClientOriginalExtension();
+                $suratTugasName = time() . '_surat.' . $suratTugasExtension;
                 $suratTugas->storeAs('surat_tugas', $suratTugasName, 'public');
                 $data['surat_tugas'] = $suratTugasName;
-            }
+            }            
             
             if (!$tim->update($data)) {
                 return redirect()->route('tim')->with('error', 'Gagal update tim');
@@ -108,7 +111,6 @@ class TimController extends Controller
         }
 
         return view('pages.dashboard.tim.update', [
-        //dd([
             'title' => 'Update Tim',
             'data' => $tim,
             'manager' => User::where('role', 'manager')->get(),
@@ -119,7 +121,28 @@ class TimController extends Controller
     {
         $tim = Tim::find($id);
 
-        if (!$tim->delete()){
+        if (!$tim) {
+            return redirect()->route('tim')->with('error', 'Tim not found!');
+        }
+
+        $imagePath = $tim->foto;
+        $documentPath = $tim->surat_tugas;
+
+        if ($imagePath) {
+            $fullImagePath = storage_path('app/public/foto_tim/' . $imagePath);
+            if (file_exists($fullImagePath)) {
+                unlink($fullImagePath);
+            }
+        }
+
+        if ($documentPath) {
+            $fullDocumentPath = storage_path('app/public/surat_tugas/' . $documentPath);
+            if (file_exists($fullDocumentPath)) {
+                unlink($fullDocumentPath);
+            }
+        }
+
+        if (!$tim->delete()) {
             return redirect()->route('tim')->with('error', 'Gagal delete tim!');
         }
 

@@ -12,4 +12,9 @@ class Tim extends Model
     protected $table = 'tim';
 
     protected $guarded = [];
+
+    public function atlets()
+    {
+        return $this->hasMany(Atlet::class);
+    }
 }

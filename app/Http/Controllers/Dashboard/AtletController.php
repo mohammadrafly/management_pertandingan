@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
 use App\Models\Atlet;
+use App\Models\Kelas;
 use App\Models\List\ListTim;
 use App\Models\Tim;
 use Illuminate\Http\Request;
@@ -15,7 +16,7 @@ class AtletController extends Controller
     {
         return view('pages.dashboard.atlet.index', [
             'title' => 'Data Atlet',
-            'data' => Atlet::all()
+            'data' => Atlet::all(),
         ]);
     }
 
@@ -38,6 +39,10 @@ class AtletController extends Controller
             }
     
             $id_tim = $request->tim_id;
+            $id_kelas = $request->kelas_id;
+
+            $findKelas = Kelas::where('id', $id_kelas)->first();
+            //dd($findKelas);
             $data = $validator->validated();
             $tempatTanggal = $data['tempat'] . ', ' . date('d F Y', strtotime($data['tanggal']));
             $data['ttl'] = $tempatTanggal;
@@ -71,7 +76,7 @@ class AtletController extends Controller
                 ListTim::create([
                     'tim_id' => $id_tim,
                     'atlet_id' => $insert->id,
-                    'kelas_id' => null,
+                    'kelas_id' => $id_kelas,
                 ]);
 
                 return redirect()->route('atlet')->with('success', 'Berhasil menambahkan atlet');
@@ -82,7 +87,8 @@ class AtletController extends Controller
         
         return view('pages.dashboard.atlet.create', [
             'title' => 'Tambah Atlet',
-            'tim' => Tim::all()
+            'tim' => Tim::all(),
+            'kelas' => Kelas::all()
         ]);
     }
 
@@ -106,6 +112,7 @@ class AtletController extends Controller
             }
     
             $id_tim = $request->tim_id;
+            $id_kelas = $request->kelas_id;
             $data = $validator->validated();
             $tempatTanggal = $data['tempat'] . ', ' . date('d F Y', strtotime($data['tanggal']));
             $data['ttl'] = $tempatTanggal;
@@ -138,6 +145,7 @@ class AtletController extends Controller
             if ($update) {
                 ListTim::where('atlet_id', $atlet->id)->update([
                     'tim_id' => $id_tim,
+                    'kelas_id' => $id_kelas
                 ]);
 
                 return redirect()->route('atlet')->with('success', 'Berhasil update atlet');
@@ -147,7 +155,6 @@ class AtletController extends Controller
         }
 
         return view('pages.dashboard.atlet.update', [
-        //dd([
             'title' => 'Update Atlet',
             'tim' => Tim::all(),
             'data' => $atlet,
@@ -160,6 +167,31 @@ class AtletController extends Controller
 
         if (!$atlet) {
             return redirect()->route('atlet')->with('error', 'Atlet not found!');
+        }
+
+        $fotoPath = $atlet->foto;
+        $fotoKtpPath = $atlet->foto_ktp;
+        $ijazahPath = $atlet->ijazaha_karate;
+
+        if ($fotoPath) {
+            $fullFotoPath = storage_path('app/public/fotos/' . $fotoPath);
+            if (file_exists($fullFotoPath)) {
+                unlink($fullFotoPath);
+            }
+        }
+
+        if ($fotoKtpPath) {
+            $fullFotoKtpPath = storage_path('app/public/foto_ktp/' . $fotoKtpPath);
+            if (file_exists($fullFotoKtpPath)) {
+                unlink($fullFotoKtpPath);
+            }
+        }
+
+        if ($ijazahPath) {
+            $fullIjazahPath = storage_path('app/public/ijazah_karate/' . $ijazahPath);
+            if (file_exists($fullIjazahPath)) {
+                unlink($fullIjazahPath);
+            }
         }
 
         $listTim = ListTim::where('atlet_id', $atlet->id)->first();

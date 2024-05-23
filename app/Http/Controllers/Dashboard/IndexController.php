@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
 use App\Models\Atlet;
+use App\Models\List\ListTim;
+use App\Models\List\ListTimPertandingan;
 use App\Models\Pertandingan;
 use App\Models\Tim;
 use App\Models\User;
@@ -19,12 +21,53 @@ class IndexController extends Controller
     {
         $latestPertandingan = Pertandingan::orderBy('dimulai', 'desc')->first();
 
+        $totalAtletPerKategori = ListTim::with(['tim', 'kelas'])
+            ->get()
+            ->groupBy('tim_id')
+            ->map(function ($timGroup) {
+                return $timGroup->groupBy('kelas.kategori')
+                    ->map(function ($kategoriGroup, $kategori) {
+                        return $kategoriGroup->count();
+                    });
+            })
+            ->mapWithKeys(function ($kategoriCounts, $timId) {
+                return [$timId => $kategoriCounts->toArray()];
+            })
+            ->toArray();
+
+        $flattenedCounts = [];
+        foreach ($totalAtletPerKategori as $kategoriCounts) {
+            foreach ($kategoriCounts as $kategori => $count) {
+                $formattedKategori = ucwords(str_replace('_', ' ', $kategori));
+                if (!isset($flattenedCounts[$formattedKategori])) {
+                    $flattenedCounts[$formattedKategori] = 0;
+                }
+                $flattenedCounts[$formattedKategori] += $count;
+            }
+        }
+
+        $totalAtletInPertandingan = 0;
+        $pertandinganLabel = '';
+        if ($latestPertandingan) {
+            $pertandinganLabel = $latestPertandingan->pertandingan;
+
+            $teamsInPertandingan = ListTimPertandingan::where('pertandingan_id', $latestPertandingan->id)
+                ->where('status', 'active')
+                ->pluck('tim_id');
+
+            $totalAtletInPertandingan = ListTim::whereIn('tim_id', $teamsInPertandingan)
+                ->distinct('atlet_id')
+                ->count('atlet_id');
+        }
+
         return view('pages.dashboard.index', [
             'title' => 'Dashboard',
             'countdown' => $latestPertandingan,
             'totalUser' => User::count(),
             'totalAtlet' => Atlet::count(),
-            'totalTim' => Tim::count()
+            'totalTim' => Tim::count(),
+            'totalAtletPerKelas' => $flattenedCounts,
+            'totalAtletInPertandingan' => [$pertandinganLabel => $totalAtletInPertandingan],
         ]);
     }
 

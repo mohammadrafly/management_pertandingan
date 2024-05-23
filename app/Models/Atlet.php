@@ -18,4 +18,14 @@ class Atlet extends Model
     {
         return $this->belongsTo(ListTim::class, 'id', 'atlet_id')->with('Tim');
     }
+
+    public function tim()
+    {
+        return $this->belongsTo(Tim::class);
+    }
+
+    public function kelas()
+    {
+        return $this->belongsTo(Kelas::class);
+    }
 }

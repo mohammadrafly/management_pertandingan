@@ -73,56 +73,79 @@
 
 @section('script')
 <script>
-    const ctx = document.getElementById('myDonat');
+     const ctx = document.getElementById('myDonat');
 
     new Chart(ctx, {
         type: 'doughnut',
         data: {
-            labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+            labels: {!! json_encode(array_map(function($label) { return ucwords($label); }, array_keys($totalAtletPerKelas))) !!},
             datasets: [{
-                label: '# of Votes',
-                data: [12, 19, 3, 5, 2, 3],
+                label: '# of Atlet Per Kelas',
+                data: {!! json_encode(array_values($totalAtletPerKelas)) !!},
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.5)',
+                    'rgba(54, 162, 235, 0.5)',
+                    'rgba(255, 206, 86, 0.5)',
+                    'rgba(75, 192, 192, 0.5)',
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                ],
+                borderWidth: 1
             }]
         },
         options: {
             responsive: true,
             plugins: {
-            legend: {
-                position: 'top',
-            },
-            title: {
-                display: true,
-                text: 'Chart.js Doughnut Chart'
-            }
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Total Atlet Per Kelas'
+                }
             }
         },
     });
 
     const ctxBar = document.getElementById('myBar');
 
+    const tournamentData = <?php echo json_encode($totalAtletInPertandingan); ?>;
+
+    const tournamentNames = Object.keys(tournamentData);
+    const totalAthletes = Object.values(tournamentData);
+
+    console.log(tournamentNames)
+
     new Chart(ctxBar, {
         type: 'bar',
         data: {
-            labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+            labels: tournamentNames,
             datasets: [{
-                label: '# of Votes',
-                data: [12, 19, 3, 5, 2, 3],
+                label: '# of Atlet',
+                data: totalAthletes,
+                backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
             }]
         },
         options: {
             responsive: true,
             plugins: {
-            legend: {
-                position: 'top',
-            },
-            title: {
-                display: true,
-                text: 'Chart.js Bar Chart'
-            }
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Total Atlet in Pertandingan' // Adjust title as needed
+                }
             }
         },
     });
-   
+    
     function countdownTimer(startTime) {
         return {
             timeRemaining: '',
