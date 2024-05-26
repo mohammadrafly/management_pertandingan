@@ -11,12 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pembayaran', function (Blueprint $table) {
+        Schema::create('list_atlet_with_kelas', function (Blueprint $table) {
             $table->id();
-            $table->string('pertandingan_id');
-            $table->string('tim_id');
-            $table->string('total');
-            $table->string('status');
+            $table->string('list_atlet_in_team_id');
+            $table->string('kelas_id');
             $table->timestamps();
         });
     }
@@ -26,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pembayaran');
+        Schema::dropIfExists('list_atlet_with_kelas');
     }
 };

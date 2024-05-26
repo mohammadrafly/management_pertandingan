@@ -24,20 +24,20 @@ class KelasController extends Controller
             $bb = $request->input('bb_min') . ' - ' . $request->input('bb_max');
 
             $request->merge(['bb' => $bb]);
-            
+
             $validator = Validator::make($request->all(), [
                 'nama' => 'required|string',
                 'kategori' => 'required|in:kata_perorangan,kata_beregu,kumite_perorangan,kumite_beregu',
                 'bb' => 'required|string',
-                'img' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
+                'img' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
             ]);
-    
+
             if ($validator->fails()) {
                 return redirect()->back()->withErrors($validator)->withInput();
             }
 
             $data = $validator->validated();
-            
+
             if ($request->hasFile('img')) {
                 $img = $request->file('img');
                 $imgExtension = $img->getClientOriginalExtension();
@@ -45,14 +45,14 @@ class KelasController extends Controller
                 $img->storeAs('thumbnail_kelas', $imgName, 'public');
                 $data['img'] = $imgName;
             }
-    
+
             if (Kelas::create($data)) {
                 return redirect()->route('kelas')->with('success', 'Berhasil menambahkan kelas');
             } else {
                 return redirect()->route('kelas')->with('error', 'Gagal menambahkan kelas');
             }
         }
-    
+
         return view('pages.dashboard.kelas.create', [
             'title' => 'Tambah Kelas'
         ]);
@@ -65,14 +65,14 @@ class KelasController extends Controller
             $bb = $request->input('bb_min') . ' - ' . $request->input('bb_max');
 
             $request->merge(['bb' => $bb]);
-            
+
             $validator = Validator::make($request->all(), [
                 'nama' => 'required|string',
                 'kategori' => 'required|in:kata_perorangan,kata_beregu,kumite_perorangan,kumite_beregu',
                 'bb' => 'required|string',
                 'img' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
             ]);
-    
+
             if ($validator->fails()) {
                 return redirect()->back()->withErrors($validator)->withInput();
             }
@@ -85,7 +85,7 @@ class KelasController extends Controller
                 $thumbnailKelas->storeAs('thumbnail_kelas', $thumbnailKelasName, 'public');
                 $data['img'] = $thumbnailKelasName;
             }
-    
+
             if ($kelas->update($data)) {
                 return redirect()->route('kelas')->with('success', 'Berhasil update kelas');
             } else {

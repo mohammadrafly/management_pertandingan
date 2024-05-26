@@ -3,14 +3,14 @@
 use App\Http\Controllers\Authentication\AuthController;
 use App\Http\Controllers\Dashboard\AtletController;
 use App\Http\Controllers\Dashboard\IndexController;
-use App\Http\Controllers\Dashboard\KategoriController;
 use App\Http\Controllers\Dashboard\KelasController;
-use App\Http\Controllers\Dashboard\List\ListTimController;
-use App\Http\Controllers\Dashboard\List\ListTimPertandinganController;
 use App\Http\Controllers\Dashboard\PembayaranController;
 use App\Http\Controllers\Dashboard\PertandinganController;
 use App\Http\Controllers\Dashboard\TimController;
 use App\Http\Controllers\Dashboard\UserController;
+use App\Http\Controllers\Manajer\AtletController as ManajerAtletController;
+use App\Http\Controllers\Manajer\KelasController as ManajerKelasController;
+use App\Http\Controllers\Manajer\TimController as ManajerTimController;
 use App\Http\Controllers\SettingController;
 use Illuminate\Support\Facades\Route;
 
@@ -70,36 +70,48 @@ Route::middleware('auth')->group(function() {
                     Route::match(['GET'], 'delete/{id}', 'delete')->name('setting.delete');
                 });
             });
-        });
-        Route::prefix('pertandingan')->group(function() {
-            Route::controller(PertandinganController::class)->group(function() {
-                Route::match(['GET'], '/', 'index')->name('pertandingan');
-                Route::match(['GET', 'POST'], 'create', 'create')->name('pertandingan.create');
-                Route::match(['GET', 'POST'], 'update/{id}', 'update')->name('pertandingan.update');
-                Route::match(['GET'], 'delete/{id}', 'delete')->name('pertandingan.delete');
+            Route::prefix('pertandingan')->group(function() {
+                Route::controller(PertandinganController::class)->group(function() {
+                    Route::match(['GET'], '/', 'index')->name('pertandingan');
+                    Route::match(['GET', 'POST'], 'create', 'create')->name('pertandingan.create');
+                    Route::match(['GET', 'POST'], 'update/{id}', 'update')->name('pertandingan.update');
+                    Route::match(['GET'], 'delete/{id}', 'delete')->name('pertandingan.delete');
+                });
             });
-            Route::prefix('list/tim')->group(function() {
-                Route::controller(ListTimPertandinganController::class)->group(function() {
-                    Route::match(['GET'], '{id}', 'index')->name('pertandingan.list');
-                    Route::match(['GET', 'POST'], 'create', 'create')->name('pertandingan.list.create');
-                    Route::match(['GET', 'POST'], 'update/{id}', 'update')->name('pertandingan.list.update');
-                    Route::match(['GET'], 'delete/{id}', 'delete')->name('pertandingan.list.delete');
+            Route::prefix('tim')->group(function() {
+                Route::controller(TimController::class)->group(function() {
+                    Route::match(['GET'], '/', 'index')->name('tim');
+                    Route::match(['GET', 'POST'], 'create', 'create')->name('tim.create');
+                    Route::match(['GET', 'POST'], 'update/{id}', 'update')->name('tim.update');
+                    Route::match(['GET'], 'delete/{id}', 'delete')->name('tim.delete');
                 });
             });
         });
-        Route::prefix('tim')->group(function() {
-            Route::controller(TimController::class)->group(function() {
-                Route::match(['GET'], '/', 'index')->name('tim');
-                Route::match(['GET', 'POST'], 'create', 'create')->name('tim.create');
-                Route::match(['GET', 'POST'], 'update/{id}', 'update')->name('tim.update');
-                Route::match(['GET'], 'delete/{id}', 'delete')->name('tim.delete');
-            });
-            Route::prefix('list/atlet')->group(function() {
-                Route::controller(ListTimController::class)->group(function() {
-                    Route::match(['GET'], '{id}', 'index')->name('tim.list');
-                    Route::match(['GET', 'POST'], 'create', 'create')->name('tim.list.create');
-                    Route::match(['GET', 'POST'], 'update/{id}', 'update')->name('tim.list.update');
-                    Route::match(['GET'], 'delete/{id}', 'delete')->name('tim.list.delete');
+        Route::middleware('authenticatedAs:manager')->group(function() {
+            Route::prefix('manajer')->group(function() {
+                Route::prefix('my/atlet')->group(function() {
+                    Route::controller(ManajerAtletController::class)->group(function() {
+                        Route::match(['GET'], '/', 'index')->name('manajer.atlet');
+                        Route::match(['GET', 'POST'], 'create', 'create')->name('manajer.atlet.create');
+                        Route::match(['GET', 'POST'], 'update/{id}', 'update')->name('manajer.atlet.update');
+                        Route::match(['GET'], 'delete/{id}', 'delete')->name('manajer.atlet.delete');
+                    });
+                });
+                Route::prefix('my/tim')->group(function() {
+                    Route::controller(ManajerTimController::class)->group(function() {
+                        Route::match(['GET', 'POST'], '/', 'index')->name('manajer.my.tim');
+                    });
+                });
+                Route::prefix('kelas')->group(function() {
+                    Route::controller(ManajerKelasController::class)->group(function() {
+                        Route::match(['GET'], '/', 'index')->name('manajer.kelas');
+                        Route::prefix('list')->group(function() {
+                            Route::match(['GET'], '/{kelas}', 'list')->name('manajer.kelas.list');
+                            Route::match(['GET', 'POST'], 'create/{kelas}', 'create')->name('manajer.kelas.create');
+                            Route::match(['GET', 'POST'], 'update/{kelas}/{id}', 'update')->name('manajer.kelas.update');
+                            Route::match(['GET'], 'delete/{kelas}/{id}', 'delete')->name('manajer.kelas.delete');
+                        });
+                    });
                 });
             });
         });

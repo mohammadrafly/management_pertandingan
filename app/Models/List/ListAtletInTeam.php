@@ -3,22 +3,21 @@
 namespace App\Models\List;
 
 use App\Models\Atlet;
-use App\Models\Kelas;
 use App\Models\Tim;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ListTim extends Model
+class ListAtletInTeam extends Model
 {
     use HasFactory;
 
-    protected $table = 'list_tim';
+    protected $table = 'list_atlet_in_team';
 
     protected $guarded = [];
 
-    public function tim()
+    public function team()
     {
-        return $this->belongsTo(Tim::class, 'tim_id', 'id');
+        return $this->belongsTo(Tim::class, 'tim_id', 'id')->with('user');
     }
 
     public function atlet()
@@ -26,8 +25,9 @@ class ListTim extends Model
         return $this->belongsTo(Atlet::class, 'atlet_id', 'id');
     }
 
-    public function kelas()
-    {
-        return $this->belongsTo(Kelas::class, 'kelas_id', 'id');
-    }
+    public function listAtletWithKelas()
+{
+    return $this->hasMany(ListAtletWithKelas::class, 'list_atlet_in_team_id');
+}
+
 }

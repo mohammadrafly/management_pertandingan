@@ -23,12 +23,17 @@ class SettingController extends Controller
                 'type' => 'required|in:pembayaran_tim,pembayaran_atlet',
                 'harga' => 'required|string',
             ]);
-    
+
             if ($validator->fails()) {
                 return redirect()->back()->withErrors($validator)->withInput();
             }
 
             $data = $validator->validated();
+
+            // Check if the type already exists
+            if (Setting::where('type', $data['type'])->exists()) {
+                return redirect()->back()->withErrors(['type' => 'This type already exists.'])->withInput();
+            }
 
             if (Setting::create($data)) {
                 return redirect()->route('setting')->with('success', 'Berhasil menambahkan setting');
@@ -45,17 +50,26 @@ class SettingController extends Controller
     public function update(Request $request, $id)
     {
         $setting = Setting::find($id);
+        if (!$setting) {
+            return redirect()->route('setting')->with('error', 'Setting not found!');
+        }
+
         if ($request->isMethod('POST')) {
             $validator = Validator::make($request->all(), [
                 'type' => 'required|in:pembayaran_tim,pembayaran_atlet',
                 'harga' => 'required|string',
             ]);
-    
+
             if ($validator->fails()) {
                 return redirect()->back()->withErrors($validator)->withInput();
             }
 
             $data = $validator->validated();
+
+            // Check if the type already exists (excluding the current record)
+            if (Setting::where('type', $data['type'])->where('id', '<>', $id)->exists()) {
+                return redirect()->back()->withErrors(['type' => 'This type already exists.'])->withInput();
+            }
 
             if ($setting->update($data)) {
                 return redirect()->route('setting')->with('success', 'Berhasil update setting');
@@ -74,10 +88,14 @@ class SettingController extends Controller
     {
         $setting = Setting::find($id);
 
+        if (!$setting) {
+            return redirect()->route('setting')->with('error', 'Setting not found!');
+        }
+
         if ($setting->delete()) {
             return redirect()->route('setting')->with('success', 'Successfully deleted setting!');
         }
-    
+
         return redirect()->route('setting')->with('error', 'Failed to delete setting!');
     }
 }

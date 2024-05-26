@@ -1,36 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
-    
-<form action="{{ route('atlet.create') }}" method="POST" enctype="multipart/form-data">
+
+<form action="{{ route('manajer.atlet.create') }}" method="POST" enctype="multipart/form-data">
     @csrf
-
-    <div class="mb-4">
-        <label for="tim_id" class="block text-gray-700">Tim</label>
-        <select name="tim_id" id="tim_id" class="js-example-basic-single w-full px-3 py-2 border rounded @error('tim_id') border-red-500 @enderror">
-            <option value="">Pilih Tim</option>
-            @foreach ($tim as $item)
-                <option value="{{ $item->id }}" {{ old('tim_id') }}>{{ $item->nama }}</option>
-            @endforeach
-        </select>
-        @error('tim_id')
-            <p class="text-red-500 text-xs italic mt-2">{{ $message }}</p>
-        @enderror
-    </div>
-
-    <div class="mb-4">
-        <label for="kelas_id" class="block text-gray-700">Kelas</label>
-        <select name="kelas_id" id="kelas_id" class="js-example-basic-single w-full px-3 py-2 border rounded @error('kelas_id') border-red-500 @enderror">
-            <option value="">Pilih Kelas</option>
-            @foreach ($kelas as $item)
-                <option value="{{ $item->id }}" {{ old('kelas_id') }}>{{ $item->nama }}</option>
-            @endforeach
-        </select>
-        @error('kelas_id')
-            <p class="text-red-500 text-xs italic mt-2">{{ $message }}</p>
-        @enderror
-    </div>
-
     <div class="mb-4">
         <label for="nama" class="block text-gray-700">Nama</label>
         <input type="text" name="nama" id="nama" class="w-full px-3 py-2 border rounded @error('nama') border-red-500 @enderror" value="{{ old('nama') }}">
@@ -114,4 +87,4 @@
             $('.js-example-basic-single').select2();
         });
     </script>
-@endsection 
+@endsection

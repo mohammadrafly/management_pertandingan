@@ -1,22 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
-    
+
 <form action="{{ route('atlet.update', $data->id) }}" method="POST" enctype="multipart/form-data">
     @csrf
-
-    <div class="mb-4">
-        <label for="tim_id" class="block text-gray-700">Tim</label>
-        <select name="tim_id" id="tim_id" class="js-example-basic-single w-full px-3 py-2 border rounded @error('tim_id') border-red-500 @enderror">
-            <option value="">Pilih Tim</option>
-            @foreach ($tim as $item)
-                <option value="{{ $item->id }}" {{ old('tim_id') == $item->id || (isset($data) && $data->ListTim->Tim->id == $item->id) ? 'selected' : '' }}>{{ $item->nama }}</option>
-            @endforeach
-        </select>
-        @error('tim_id')
-            <p class="text-red-500 text-xs italic mt-2">{{ $message }}</p>
-        @enderror
-    </div>
 
     <div class="mb-4">
         <label for="nama" class="block text-gray-700">Nama</label>
@@ -24,7 +11,7 @@
         @error('nama')
             <p class="text-red-500 text-xs italic mt-2">{{ $message }}</p>
         @enderror
-    </div>    
+    </div>
 
     <div class="mb-4 flex gap-5">
         <div class="w-full">
@@ -67,7 +54,7 @@
             @error('bb')
                 <p class="text-red-500 text-xs italic mt-2">{{ $message }}</p>
             @enderror
-        </div>        
+        </div>
     </div>
 
     <div class="mb-4 flex gap-5">
@@ -94,9 +81,9 @@
             @error('foto_ktp')
                 <p class="text-red-500 text-xs italic mt-2">{{ $message }}</p>
             @enderror
-        </div>        
+        </div>
     </div>
-    
+
     <div class="mb-4">
         <label for="ijazah_karate" class="block text-gray-700">Ijazah Karate</label>
         <input type="file" name="ijazah_karate" id="ijazah_karate" class="w-full px-3 py-2 border rounded @error('ijazah_karate') border-red-500 @enderror" value="{{ $data->ijazah_karate }}">
@@ -143,4 +130,4 @@
             $('.js-example-basic-single').select2();
         });
     </script>
-@endsection 
+@endsection

@@ -12,9 +12,4 @@ class Kelas extends Model
     protected $table = 'kelas';
 
     protected $guarded = [];
-
-    public function atlets()
-    {
-        return $this->hasMany(Atlet::class);
-    }
 }

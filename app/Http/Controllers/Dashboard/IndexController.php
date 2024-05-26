@@ -4,8 +4,6 @@ namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
 use App\Models\Atlet;
-use App\Models\List\ListTim;
-use App\Models\List\ListTimPertandingan;
 use App\Models\Pertandingan;
 use App\Models\Tim;
 use App\Models\User;
@@ -21,53 +19,13 @@ class IndexController extends Controller
     {
         $latestPertandingan = Pertandingan::orderBy('dimulai', 'desc')->first();
 
-        $totalAtletPerKategori = ListTim::with(['tim', 'kelas'])
-            ->get()
-            ->groupBy('tim_id')
-            ->map(function ($timGroup) {
-                return $timGroup->groupBy('kelas.kategori')
-                    ->map(function ($kategoriGroup, $kategori) {
-                        return $kategoriGroup->count();
-                    });
-            })
-            ->mapWithKeys(function ($kategoriCounts, $timId) {
-                return [$timId => $kategoriCounts->toArray()];
-            })
-            ->toArray();
-
-        $flattenedCounts = [];
-        foreach ($totalAtletPerKategori as $kategoriCounts) {
-            foreach ($kategoriCounts as $kategori => $count) {
-                $formattedKategori = ucwords(str_replace('_', ' ', $kategori));
-                if (!isset($flattenedCounts[$formattedKategori])) {
-                    $flattenedCounts[$formattedKategori] = 0;
-                }
-                $flattenedCounts[$formattedKategori] += $count;
-            }
-        }
-
-        $totalAtletInPertandingan = 0;
-        $pertandinganLabel = '';
-        if ($latestPertandingan) {
-            $pertandinganLabel = $latestPertandingan->pertandingan;
-
-            $teamsInPertandingan = ListTimPertandingan::where('pertandingan_id', $latestPertandingan->id)
-                ->where('status', 'active')
-                ->pluck('tim_id');
-
-            $totalAtletInPertandingan = ListTim::whereIn('tim_id', $teamsInPertandingan)
-                ->distinct('atlet_id')
-                ->count('atlet_id');
-        }
-
         return view('pages.dashboard.index', [
+        //dd([
             'title' => 'Dashboard',
             'countdown' => $latestPertandingan,
             'totalUser' => User::count(),
             'totalAtlet' => Atlet::count(),
             'totalTim' => Tim::count(),
-            'totalAtletPerKelas' => $flattenedCounts,
-            'totalAtletInPertandingan' => [$pertandinganLabel => $totalAtletInPertandingan],
         ]);
     }
 
@@ -83,26 +41,35 @@ class IndexController extends Controller
     {
         $data = User::find(Auth::id());
 
-        if($request->isMethod('POST')) {
+        if ($request->isMethod('POST')) {
             $validator = Validator::make($request->all(), [
                 'name' => 'required',
-                'email' => 'required|email|unique:users,email,'. $data->id,
+                'email' => 'required|email|unique:users,email,' . $data->id,
+                'photo' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             ]);
-            
+
             if ($validator->fails()) {
-                return redirect()->route('profile')->withErrors($validator)->withInput();
+                return redirect()->back()->withErrors($validator)->withInput();
             }
 
             $input = $validator->validated();
 
-            if (!$data->update($input)) {
-                return redirect()->route('profile')->with('error', 'Gagal update profile');
+            if ($request->hasFile('photo')) {
+                $photo = $request->file('photo');
+                $photoName = time() . '_foto_manager';
+                $photo->storeAs('public/foto_manager', $photoName);
+                $input['photo'] = $photoName;
             }
 
-            return redirect()->route('profile')->with('success', 'Success update profile');
+            if (!$data->update($input)) {
+                return redirect()->back()->with('error', 'Gagal update profile');
+            }
+
+            return redirect()->back()->with('success', 'Success update profile');
         }
 
         return view('pages.dashboard.profile', [
+        //dd([
             'title' => 'Update Profile',
             'data' => $data
         ]);
@@ -125,14 +92,14 @@ class IndexController extends Controller
             $user = User::find(Auth::id());
             $old_password = $request->old_password;
             $new_password = $request->new_password;
-    
+
             if (!Hash::check($old_password, $user->password)) {
                 return redirect()->route('profile')->with('error', 'Gagal update password: Password lama salah.');
             }
-    
+
             $user->password = Hash::make($new_password);
             $user->save();
-    
+
             return redirect()->route('profile')->with('success', 'Berhasil update password');
         }
     }

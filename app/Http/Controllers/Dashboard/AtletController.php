@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Dashboard;
 use App\Http\Controllers\Controller;
 use App\Models\Atlet;
 use App\Models\Kelas;
+use App\Models\List\ListAtletInTeam;
 use App\Models\List\ListTim;
 use App\Models\Tim;
 use Illuminate\Http\Request;
@@ -17,78 +18,6 @@ class AtletController extends Controller
         return view('pages.dashboard.atlet.index', [
             'title' => 'Data Atlet',
             'data' => Atlet::all(),
-        ]);
-    }
-
-    public function create(Request $request)
-    {
-        if ($request->isMethod('POST')) {
-            $validator = Validator::make($request->all(), [
-                'nama' => 'required|string',
-                'tempat' => 'required|string',
-                'tanggal' => 'required|date',
-                'jk' => 'required|in:l,p',
-                'bb' => 'required|string',
-                'foto' => 'image|mimes:jpeg,png,jpg|max:2048',
-                'foto_ktp' => 'image|mimes:jpeg,png,jpg|max:2048',
-                'ijazah_karate' => 'file|mimes:pdf|max:2048',
-            ]);
-    
-            if ($validator->fails()) {
-                return redirect()->back()->withErrors($validator)->withInput();
-            }
-    
-            $id_tim = $request->tim_id;
-            $id_kelas = $request->kelas_id;
-
-            $findKelas = Kelas::where('id', $id_kelas)->first();
-            //dd($findKelas);
-            $data = $validator->validated();
-            $tempatTanggal = $data['tempat'] . ', ' . date('d F Y', strtotime($data['tanggal']));
-            $data['ttl'] = $tempatTanggal;
-
-            unset($data['tempat']);
-            unset($data['tanggal']);
-    
-            if ($request->hasFile('foto')) {
-                $foto = $request->file('foto');
-                $fotoName = time() . '_' . $foto->getClientOriginalName();
-                $foto->storeAs('fotos', $fotoName, 'public');
-                $data['foto'] = $fotoName;
-            }
-    
-            if ($request->hasFile('foto_ktp')) {
-                $file = $request->file('foto_ktp');
-                $fileName = time() . '_' . $file->getClientOriginalName();
-                $file->storeAs('foto_ktp', $fileName, 'public');
-                $data['foto_ktp'] = $fileName;
-            }
-
-            if ($request->hasFile('ijazah_karate')) {
-                $file = $request->file('ijazah_karate');
-                $fileName = time() . '_' . $file->getClientOriginalName();
-                $file->storeAs('ijazah_karate', $fileName, 'public');
-                $data['ijazah_karate'] = $fileName;
-            }
-            
-            $insert = Atlet::create($data);
-            if ($insert) {
-                ListTim::create([
-                    'tim_id' => $id_tim,
-                    'atlet_id' => $insert->id,
-                    'kelas_id' => $id_kelas,
-                ]);
-
-                return redirect()->route('atlet')->with('success', 'Berhasil menambahkan atlet');
-            } else {
-                return redirect()->route('atlet')->with('error', 'Gagal menambahkan atlet');
-            }
-        }
-        
-        return view('pages.dashboard.atlet.create', [
-            'title' => 'Tambah Atlet',
-            'tim' => Tim::all(),
-            'kelas' => Kelas::all()
         ]);
     }
 
@@ -106,11 +35,11 @@ class AtletController extends Controller
                 'foto_ktp' => 'image|mimes:jpeg,png,jpg|max:2048',
                 'ijazah_karate' => 'file|mimes:pdf|max:2048',
             ]);
-    
+
             if ($validator->fails()) {
                 return redirect()->back()->withErrors($validator)->withInput();
             }
-    
+
             $id_tim = $request->tim_id;
             $id_kelas = $request->kelas_id;
             $data = $validator->validated();
@@ -119,14 +48,14 @@ class AtletController extends Controller
 
             unset($data['tempat']);
             unset($data['tanggal']);
-    
+
             if ($request->hasFile('foto')) {
                 $foto = $request->file('foto');
                 $fotoName = time() . '_' . $foto->getClientOriginalName();
                 $foto->storeAs('fotos', $fotoName, 'public');
                 $data['foto'] = $fotoName;
             }
-    
+
             if ($request->hasFile('foto_ktp')) {
                 $file = $request->file('foto_ktp');
                 $fileName = time() . '_' . $file->getClientOriginalName();
@@ -140,14 +69,8 @@ class AtletController extends Controller
                 $file->storeAs('ijazah_karate', $fileName, 'public');
                 $data['ijazah_karate'] = $fileName;
             }
-            
-            $update = $atlet->update($data);
-            if ($update) {
-                ListTim::where('atlet_id', $atlet->id)->update([
-                    'tim_id' => $id_tim,
-                    'kelas_id' => $id_kelas
-                ]);
 
+            if ($atlet->update($data)) {
                 return redirect()->route('atlet')->with('success', 'Berhasil update atlet');
             } else {
                 return redirect()->route('atlet')->with('error', 'Gagal update atlet');
@@ -194,18 +117,18 @@ class AtletController extends Controller
             }
         }
 
-        $listTim = ListTim::where('atlet_id', $atlet->id)->first();
+        $listTim = ListAtletInTeam::where('atlet_id', $atlet->id)->first();
 
         if ($listTim && $listTim->delete()) {
             $atlet->delete();
             return redirect()->route('atlet')->with('success', 'Successfully deleted atlet!');
         }
-    
+
         if (!$listTim) {
             $atlet->delete();
             return redirect()->route('atlet')->with('success', 'Successfully deleted atlet without associated team!');
         }
-    
+
         return redirect()->route('atlet')->with('error', 'Failed to delete atlet!');
-    }    
+    }
 }

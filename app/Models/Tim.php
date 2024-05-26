@@ -13,8 +13,8 @@ class Tim extends Model
 
     protected $guarded = [];
 
-    public function atlets()
+    public function user()
     {
-        return $this->hasMany(Atlet::class);
+        return $this->belongsTo(User::class, 'manager', 'id');
     }
 }
