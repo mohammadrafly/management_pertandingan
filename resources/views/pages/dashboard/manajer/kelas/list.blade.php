@@ -1,12 +1,16 @@
 @extends('layouts.app')
 
 @section('tambah')
+    @if ($sudahBayar)
+
+    @else
     <a href="{{ route('manajer.kelas.create', $id_kelas)}}" class="transition-colors duration-300 flex items-center bg-blue-500 text-white py-1.5 px-4 rounded hover:bg-white border-blue-500 border hover:text-blue-500">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
         </svg>
         Tambah
     </a>
+    @endif
 @endsection
 
 @section('content')
@@ -19,7 +23,11 @@
             <th>Tempat, Tanggal Lahir</th>
             <th>Gender</th>
             <th>Berat badan</th>
+            @if ($sudahBayar)
+
+            @else
             <th>Action</th>
+            @endif
         </tr>
     </thead>
     <tbody>
@@ -30,6 +38,9 @@
             <td>{{ $item->listAtletInTeam->atlet->ttl }}</td>
             <td>{{ $item->listAtletInTeam->atlet->jk == 'l' ? 'Laki-laki' : 'Perempuan' }}</td>
             <td>{{ $item->listAtletInTeam->atlet->bb }} Kg</td>
+            @if ($sudahBayar)
+
+            @else
             <td class="flex items-center">
                 <a href="{{ route('manajer.kelas.delete', ['kelas' => $id_kelas->id, 'id' => $item->id])}}" onclick="return confirm('Are you sure you want to delete this data?');" class="transition-colors duration-300 bg-red-500 p-1 rounded text-white mr-3 hover:bg-white border-red-500 border hover:text-red-500">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
@@ -37,6 +48,7 @@
                     </svg>
                 </a>
             </td>
+            @endif
         </tr>
         @endforeach
     </tbody>

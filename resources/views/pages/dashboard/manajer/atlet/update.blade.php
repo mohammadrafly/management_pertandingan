@@ -2,7 +2,7 @@
 
 @section('content')
 
-<form action="{{ route('manajer.atlet.create') }}" method="POST" enctype="multipart/form-data">
+<form action="{{ route('manajer.atlet.update', $data->id) }}" method="POST" enctype="multipart/form-data">
     @csrf
     <div class="mb-4">
         <label for="nama" class="block text-gray-700">Nama</label>
@@ -13,10 +13,8 @@
     </div>
 
     @php
-        // Assume $data->ttl contains the value "Besuki, 19 july 2001"
         if(isset($data->ttl)) {
             list($tempat, $tanggalRaw) = explode(', ', $data->ttl);
-            // Convert the date to the Y-m-d format
             $tanggal = date('Y-m-d', strtotime($tanggalRaw));
         } else {
             $tempat = '';

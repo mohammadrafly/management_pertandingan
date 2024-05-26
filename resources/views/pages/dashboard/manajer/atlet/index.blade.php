@@ -1,12 +1,15 @@
 @extends('layouts.app')
 
 @section('tambah')
+<div class="flex">
     <a href="{{ route('manajer.atlet.create')}}" class="transition-colors duration-300 flex items-center bg-blue-500 text-white py-1.5 px-4 rounded hover:bg-white border-blue-500 border hover:text-blue-500">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
         </svg>
         Tambah
     </a>
+</div>
+
 @endsection
 
 @section('content')
@@ -54,9 +57,26 @@
 @endsection
 
 @section('script')
-    <script>
-        $(document).ready( function () {
-            $('#table').DataTable();
-        } );
-    </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+<script src="https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js"></script>
+
+<script>
+$(document).ready(function () {
+    $('#table').DataTable();
+
+    $('.cetak-id-card-btn').click(function (event) {
+        event.preventDefault();
+        html2canvas(document.querySelector("#id-card-content"), {
+            onrendered: function(canvas) {
+                const imgData = canvas.toDataURL('image/png');
+
+                const downloadLink = document.createElement('a');
+                downloadLink.href = imgData;
+                downloadLink.download = 'id_card.png';
+                downloadLink.click();
+            }
+        });
+    });
+});
+</script>
 @endsection

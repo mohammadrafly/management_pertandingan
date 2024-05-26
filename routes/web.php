@@ -10,6 +10,7 @@ use App\Http\Controllers\Dashboard\TimController;
 use App\Http\Controllers\Dashboard\UserController;
 use App\Http\Controllers\Manajer\AtletController as ManajerAtletController;
 use App\Http\Controllers\Manajer\KelasController as ManajerKelasController;
+use App\Http\Controllers\Manajer\PertandinganController as ManajerPertandinganController;
 use App\Http\Controllers\Manajer\TimController as ManajerTimController;
 use App\Http\Controllers\SettingController;
 use Illuminate\Support\Facades\Route;
@@ -95,11 +96,20 @@ Route::middleware('auth')->group(function() {
                         Route::match(['GET', 'POST'], 'create', 'create')->name('manajer.atlet.create');
                         Route::match(['GET', 'POST'], 'update/{id}', 'update')->name('manajer.atlet.update');
                         Route::match(['GET'], 'delete/{id}', 'delete')->name('manajer.atlet.delete');
+                        Route::get('idcard/{id}', 'cetakIdCard')->name('manajer.atlet.cetak-idcard');
+                        Route::get('list/idcard', 'idCard')->name('manajer.atlet.list.idcard');
                     });
                 });
                 Route::prefix('my/tim')->group(function() {
                     Route::controller(ManajerTimController::class)->group(function() {
                         Route::match(['GET', 'POST'], '/', 'index')->name('manajer.my.tim');
+                    });
+                });
+                Route::prefix('pertandingan')->group(function() {
+                    Route::controller(ManajerPertandinganController::class)->group(function() {
+                        Route::match(['GET', 'POST'], '/', 'index')->name('manajer.pertandingan');
+                        Route::match(['GET'], 'daftar/{pertandingan}/{team}', 'daftarPertandingan')->name('manajer.pertandingan.daftar');
+                        Route::get('bayar/{pertandingan}/{team}', 'bayarDanAktivasi')->name('manajer.pertandingan.bayar');
                     });
                 });
                 Route::prefix('kelas')->group(function() {
@@ -116,4 +126,8 @@ Route::middleware('auth')->group(function() {
             });
         });
     });
+});
+
+Route::controller(ManajerPertandinganController::class)->group(function() {
+    Route::post('api/callback/success/{id}', 'callbackSuccess')->name('api.callback.success');
 });

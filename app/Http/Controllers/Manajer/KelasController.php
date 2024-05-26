@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Kelas;
 use App\Models\List\ListAtletInTeam;
 use App\Models\List\ListAtletWithKelas;
+use App\Models\Pembayaran;
+use App\Models\Pertandingan;
 use App\Models\Tim;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -29,24 +31,35 @@ class KelasController extends Controller
             return redirect()->route('manajer.my.tim')->with('error', 'Anda tidak memiliki tim! silahkan daftarkan tim anda terlebih dahulu.');
         }
 
+        $currentPertandingan = Pertandingan::orderBy('dimulai', 'desc')->first();
+
+        if (!$currentPertandingan) {
+            return redirect()->route('manajer.my.tim')->with('error', 'Tidak ada pertandingan yang tersedia saat ini.');
+        }
+
+        $paymentExists = Pembayaran::where('tim_id', $team->id)
+                                    ->where('pertandingan_id', $currentPertandingan->id)
+                                    ->where('status', '1')
+                                    ->exists();
+
         $timId = $team->id;
 
-        // Fetch athletes that belong to the manager's team and are part of the specified class
         $atlets = ListAtletWithKelas::with(['listAtletInTeam' => function($query) use ($timId) {
                             $query->where('tim_id', $timId);
                         }])
                         ->where('kelas_id', $kelas)
                         ->get();
 
-        // Ensure we only get athletes that actually match the team ID
         $filteredAtlets = $atlets->filter(function($atlet) {
             return $atlet->listAtletInTeam !== null;
         });
 
+        $findKelas = Kelas::find($kelas);
         return view('pages.dashboard.manajer.kelas.list', [
-            'title' => 'Daftar Atlet '. $team->nama,
+            'title' => 'Daftar Atlet '. $findKelas->nama,
             'id_kelas' => Kelas::find($kelas),
             'data' => $filteredAtlets,
+            'sudahBayar' => $paymentExists,
         ]);
     }
 

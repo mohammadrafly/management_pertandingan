@@ -13,10 +13,11 @@ return new class extends Migration
     {
         Schema::create('pembayaran', function (Blueprint $table) {
             $table->id();
+            $table->string('kode_pembayaran');
             $table->string('pertandingan_id');
             $table->string('tim_id');
             $table->string('total');
-            $table->string('status');
+            $table->enum('status', ['1', '0']);
             $table->timestamps();
         });
     }

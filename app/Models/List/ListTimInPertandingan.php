@@ -11,7 +11,7 @@ class ListTimInPertandingan extends Model
 {
     use HasFactory;
 
-    protected $table = 'list_atlet_in_pertandingan';
+    protected $table = 'list_tim_in_pertandingan';
 
     protected $guarded = [];
 

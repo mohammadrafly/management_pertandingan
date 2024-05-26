@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Manajer;
 use App\Http\Controllers\Controller;
 use App\Models\Atlet;
 use App\Models\List\ListAtletInTeam;
+use App\Models\Pertandingan;
 use App\Models\Tim;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -17,12 +18,35 @@ class AtletController extends Controller
         $team = Tim::where('manager', Auth::id())->first();
 
         if (!$team) {
-            return redirect()->route('manajer.my.tim')->with('error', 'Anda tidak memiliki tim! silahkan daftarkan tim anda terlebih dahulu.');
+            return redirect()->route('manajer.my.tim')->with('error', 'Anda tidak memiliki tim! Silahkan daftarkan tim anda terlebih dahulu.');
         }
+
+        $dataAtlet = ListAtletInTeam::with('atlet', 'team', 'listAtletWithKelas')->where('tim_id', $team->id)->get();
+
+        $pertandingan = Pertandingan::orderBy('dimulai', 'desc')->first();
 
         return view('pages.dashboard.manajer.atlet.index', [
             'title' => 'Data Atlet',
-            'data' => ListAtletInTeam::with('atlet')->where('tim_id', $team->id)->get()
+            'data' => $dataAtlet,
+        ]);
+    }
+
+    public function idCard()
+    {
+        $team = Tim::where('manager', Auth::id())->first();
+
+        if (!$team) {
+            return redirect()->route('manajer.my.tim')->with('error', 'Anda tidak memiliki tim! Silahkan daftarkan tim anda terlebih dahulu.');
+        }
+
+        $dataAtlet = ListAtletInTeam::with('atlet', 'team', 'listAtletWithKelas')->where('tim_id', $team->id)->get();
+
+        $pertandingan = Pertandingan::orderBy('dimulai', 'desc')->first();
+
+        return view('pages.dashboard.manajer.atlet.idcard', [
+            'title' => 'Data ID Card Atlet',
+            'data' => $dataAtlet,
+            'pertandingan' => $pertandingan
         ]);
     }
 
@@ -142,9 +166,9 @@ class AtletController extends Controller
 
             $update = $atlet->update($data);
             if ($update) {
-                return redirect()->route('atlet')->with('success', 'Berhasil update atlet');
+                return redirect()->route('manajer.atlet')->with('success', 'Berhasil update atlet');
             } else {
-                return redirect()->route('atlet')->with('error', 'Gagal update atlet');
+                return redirect()->route('manajer.atlet')->with('error', 'Gagal update atlet');
             }
         }
 

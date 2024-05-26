@@ -20,7 +20,6 @@ class IndexController extends Controller
         $latestPertandingan = Pertandingan::orderBy('dimulai', 'desc')->first();
 
         return view('pages.dashboard.index', [
-        //dd([
             'title' => 'Dashboard',
             'countdown' => $latestPertandingan,
             'totalUser' => User::count(),

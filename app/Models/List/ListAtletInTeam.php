@@ -27,7 +27,7 @@ class ListAtletInTeam extends Model
 
     public function listAtletWithKelas()
 {
-    return $this->hasMany(ListAtletWithKelas::class, 'list_atlet_in_team_id');
+    return $this->hasMany(ListAtletWithKelas::class, 'list_atlet_in_team_id')->with('kelas');
 }
 
 }
