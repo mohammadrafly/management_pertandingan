@@ -81,17 +81,35 @@
 @endsection
 
 @section('script')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+<script src="https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js"></script>
+
 <script>
-    document.getElementById('photo').addEventListener('change', function(event) {
-        var photoPreview = document.getElementById('photoPreview');
-        var file = event.target.files[0];
-        var reader = new FileReader();
+document.getElementById('photo').addEventListener('change', function(event) {
+    var photoPreview = document.getElementById('photoPreview');
+    var idCardPhoto = document.getElementById('idCardPhoto');
+    var file = event.target.files[0];
+    var reader = new FileReader();
 
-        reader.onload = function(e) {
-            photoPreview.src = e.target.result;
+    reader.onload = function(e) {
+        photoPreview.src = e.target.result;
+        idCardPhoto.src = e.target.result;
+    }
+
+    reader.readAsDataURL(file);
+});
+
+document.getElementById('print-id-card-btn').addEventListener('click', function(event) {
+    event.preventDefault();
+    html2canvas(document.querySelector("#id-card-content"), {
+        onrendered: function(canvas) {
+            const imgData = canvas.toDataURL('image/png');
+            const downloadLink = document.createElement('a');
+            downloadLink.href = imgData;
+            downloadLink.download = 'ID_Card.png';
+            downloadLink.click();
         }
-
-        reader.readAsDataURL(file);
     });
+});
 </script>
 @endsection

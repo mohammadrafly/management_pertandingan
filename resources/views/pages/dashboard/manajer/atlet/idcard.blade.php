@@ -10,7 +10,7 @@
                 <div>
                     <h1 class="text-5xl font-bold text-center text-white py-5">{{ $pertandingan->pertandingan }}</h1>
                     <div class="flex justify-center items-center py-2">
-                        <img src="{{ asset('storage/fotos/'. $item->atlet->foto)}}" alt="Your Profile Picture" class="size-64 rounded-full object-cover">
+                        <img src="{{ asset('storage/fotos/'. $item->atlet->foto)}}" alt="Your Profile Picture" class="size-64 object-cover">
                     </div>
                     <div class="text-white text-center">
                         <h1 class="text-5xl font-bold">{{ $item->atlet->nama }}</h1>
@@ -31,6 +31,26 @@
         </button>
     </div>
     @endforeach
+</div>
+<div>
+    <div id="id-card-content-manager" class="bg-white shadow-lg rounded-lg max-w-[620px] max-h-[900px]">
+        <div class="bg-[#cb1a29] rounded-t-lg flex justify-center items-center py-32 p-10">
+            <div>
+                <h1 class="text-5xl font-bold text-center text-white py-5">{{ $pertandingan->pertandingan }}</h1>
+                <div class="flex justify-center items-center py-2">
+                    <img src="{{ asset('storage/foto_manager/'. $manager->user->photo)}}" alt="Your Profile Picture" class="size-64 object-cover">
+                </div>
+                <div class="text-white text-center">
+                    <h1 class="text-5xl font-bold">{{ $manager->user->name }}</h1>
+                    <p class="text-3xl font-semibold">{{ $manager->nama }}</p>
+                    <p class="text-3xl font-semibold">Manager</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <button class="cetak-id-card-btn-manager transition-colors duration-300 mt-5 bg-green-500 p-1 rounded text-white mr-3 hover:bg-white border-green-500 border hover:text-green-500" data-user-nama="{{ $manager->user->nama }}">
+        Cetak ID Card
+    </button>
 </div>
 
 @endsection
@@ -59,6 +79,23 @@ $(document).ready(function () {
             }
         });
     });
+
+    $('.cetak-id-card-btn-manager').click(function (event) {
+        var userNama = $(this).data('user-nama');
+
+        event.preventDefault();
+        html2canvas(document.querySelector("#id-card-content-manager"), {
+            onrendered: function(canvas) {
+                const imgData = canvas.toDataURL('image/png');
+
+                const downloadLink = document.createElement('a');
+                downloadLink.href = imgData;
+                downloadLink.download = `${userNama}.png`;
+                downloadLink.click();
+            }
+        });
+    });
 });
+
 </script>
 @endsection

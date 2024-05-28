@@ -23,7 +23,7 @@ class AtletController extends Controller
 
     public function update(Request $request, $id)
     {
-        $atlet = Atlet::with('ListTim')->find($id);
+        $atlet = Atlet::find($id);
         if ($request->isMethod('POST')) {
             $validator = Validator::make($request->all(), [
                 'nama' => 'required|string',

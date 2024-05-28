@@ -40,13 +40,16 @@ class AtletController extends Controller
         }
 
         $dataAtlet = ListAtletInTeam::with('atlet', 'team', 'listAtletWithKelas')->where('tim_id', $team->id)->get();
-
+        $dataManager = Tim::with('user')->where('manager', Auth::id())->first();
+        //dd($dataManager);
         $pertandingan = Pertandingan::orderBy('dimulai', 'desc')->first();
 
         return view('pages.dashboard.manajer.atlet.idcard', [
             'title' => 'Data ID Card Atlet',
             'data' => $dataAtlet,
-            'pertandingan' => $pertandingan
+            'pertandingan' => $pertandingan,
+            'manager' => $dataManager,
+
         ]);
     }
 
