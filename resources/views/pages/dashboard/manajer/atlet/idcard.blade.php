@@ -26,9 +26,11 @@
                 @endforeach
             </div>
         </div>
-        <button class="cetak-id-card-btn transition-colors duration-300 mt-5 bg-green-500 p-1 rounded text-white mr-3 hover:bg-white border-green-500 border hover:text-green-500" data-atlet-nama="{{ $item->atlet->nama }}" data-index="{{ $index }}">
-            Cetak ID Card
-        </button>
+        @if ($pembayaran->status === '1')
+            <button class="cetak-id-card-btn transition-colors duration-300 mt-5 bg-green-500 p-1 rounded text-white mr-3 hover:bg-white border-green-500 border hover:text-green-500" data-atlet-nama="{{ $item->atlet->nama }}" data-index="{{ $index }}">
+                Cetak ID Card
+            </button>
+        @endif
     </div>
     @endforeach
 </div>
@@ -48,9 +50,11 @@
             </div>
         </div>
     </div>
+    @if ($pembayaran->status === '1')
     <button class="cetak-id-card-btn-manager transition-colors duration-300 mt-5 bg-green-500 p-1 rounded text-white mr-3 hover:bg-white border-green-500 border hover:text-green-500" data-user-nama="{{ $manager->user->nama }}">
         Cetak ID Card
     </button>
+    @endif
 </div>
 
 @endsection

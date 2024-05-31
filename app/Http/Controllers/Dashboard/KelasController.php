@@ -27,6 +27,7 @@ class KelasController extends Controller
 
             $validator = Validator::make($request->all(), [
                 'nama' => 'required|string',
+                'gender' => 'required|in:p,l',
                 'kategori' => 'required|in:kata_perorangan,kata_beregu,kumite_perorangan,kumite_beregu',
                 'bb' => 'required|string',
                 'img' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
@@ -68,6 +69,7 @@ class KelasController extends Controller
 
             $validator = Validator::make($request->all(), [
                 'nama' => 'required|string',
+                'gender' => 'required|in:p,l',
                 'kategori' => 'required|in:kata_perorangan,kata_beregu,kumite_perorangan,kumite_beregu',
                 'bb' => 'required|string',
                 'img' => 'image|mimes:jpeg,png,jpg,gif|max:2048'

@@ -17,7 +17,7 @@ class ListTimInPertandingan extends Model
 
     public function pertandingan()
     {
-        return $this->belongsTo(Pertandingan::class, 'list_atlet_in_team_id', 'id')->with('team', 'atlet');
+        return $this->belongsTo(Pertandingan::class, 'pertandingan_id', 'id');
     }
 
     public function team()

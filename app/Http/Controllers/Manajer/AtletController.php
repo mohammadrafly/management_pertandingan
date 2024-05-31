@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Manajer;
 use App\Http\Controllers\Controller;
 use App\Models\Atlet;
 use App\Models\List\ListAtletInTeam;
+use App\Models\Pembayaran;
 use App\Models\Pertandingan;
 use App\Models\Tim;
 use Illuminate\Http\Request;
@@ -23,8 +24,6 @@ class AtletController extends Controller
 
         $dataAtlet = ListAtletInTeam::with('atlet', 'team', 'listAtletWithKelas')->where('tim_id', $team->id)->get();
 
-        $pertandingan = Pertandingan::orderBy('dimulai', 'desc')->first();
-
         return view('pages.dashboard.manajer.atlet.index', [
             'title' => 'Data Atlet',
             'data' => $dataAtlet,
@@ -41,15 +40,20 @@ class AtletController extends Controller
 
         $dataAtlet = ListAtletInTeam::with('atlet', 'team', 'listAtletWithKelas')->where('tim_id', $team->id)->get();
         $dataManager = Tim::with('user')->where('manager', Auth::id())->first();
-        //dd($dataManager);
+
         $pertandingan = Pertandingan::orderBy('dimulai', 'desc')->first();
+        $pembayaran = Pembayaran::where('pertandingan_id', $pertandingan->id)->where('tim_id', $team->id)->first();
+
+        if (!$pembayaran) {
+            return redirect()->route('manajer.my.tim')->with('error', 'Tim anda belum mengikuti perrtandingan! Silahkan daftarkan tim anda terlebih dahulu.');
+        }
 
         return view('pages.dashboard.manajer.atlet.idcard', [
             'title' => 'Data ID Card Atlet',
             'data' => $dataAtlet,
             'pertandingan' => $pertandingan,
             'manager' => $dataManager,
-
+            'pembayaran' => $pembayaran
         ]);
     }
 

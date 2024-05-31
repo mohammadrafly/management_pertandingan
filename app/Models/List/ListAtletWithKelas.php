@@ -19,7 +19,6 @@ class ListAtletWithKelas extends Model
         return $this->belongsTo(ListAtletInTeam::class, 'list_atlet_in_team_id')->with('team', 'atlet');
     }
 
-
     public function kelas()
     {
         return $this->belongsTo(Kelas::class, 'kelas_id', 'id');

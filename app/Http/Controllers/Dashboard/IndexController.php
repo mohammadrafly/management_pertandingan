@@ -4,12 +4,15 @@ namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
 use App\Models\Atlet;
+use App\Models\List\ListAtletWithKelas as ListListAtletWithKelas;
+use App\Models\List\ListTimInPertandingan;
 use App\Models\Pertandingan;
 use App\Models\Tim;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
@@ -18,13 +21,33 @@ class IndexController extends Controller
     public function index()
     {
         $latestPertandingan = Pertandingan::orderBy('dimulai', 'desc')->first();
+        $atletCountByKelas = ListListAtletWithKelas::with('kelas')
+            ->select('kelas_id', DB::raw('count(*) as total'))
+            ->groupBy('kelas_id')
+            ->get()
+            ->mapWithKeys(function ($item) {
+                return [$item->kelas->nama => $item->total];
+            })
+            ->toArray();
+
+
+        $totalTimInPertandingan = ListTimInPertandingan::with('pertandingan')->select('pertandingan_id', DB::raw('count(*) as total'))
+            ->groupBy('pertandingan_id')
+            ->get()
+            ->mapWithKeys(function ($item) {
+                return [$item->pertandingan->pertandingan => $item->total];
+            })
+            ->toArray();
 
         return view('pages.dashboard.index', [
+        //dd([
             'title' => 'Dashboard',
             'countdown' => $latestPertandingan,
             'totalUser' => User::count(),
             'totalAtlet' => Atlet::count(),
             'totalTim' => Tim::count(),
+            'totalAtletPerKelas' => $atletCountByKelas,
+            'totalTimInPertandingan' => $totalTimInPertandingan,
         ]);
     }
 

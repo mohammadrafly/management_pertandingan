@@ -31,6 +31,18 @@
     </div>
 
     <div class="mb-4">
+        <label for="gender" class="block text-gray-700">Gender</label>
+        <select name="gender" id="gender" x-model="gender" class="w-full px-3 py-2 border rounded @error('gender') border-red-500 @enderror">
+            <option value="">Pilih Gender</option>
+            <option value="p" {{ old('gender') == 'p' ? 'selected' : ''}}>Perempuan</option>
+            <option value="l" {{ old('gender') == 'l' ? 'selected' : ''}}>Laki-laki</option>
+        </select>
+        @error('gender')
+            <p class="text-red-500 text-xs italic mt-2">{{ $message }}</p>
+        @enderror
+    </div>
+
+    <div class="mb-4">
         <label for="kategori" class="block text-gray-700">Tipe Kelas Harga</label>
         <select name="kategori" id="kategori" x-model="kategori" class="w-full px-3 py-2 border rounded @error('kategori') border-red-500 @enderror">
             <option value="">Pilih Kategori</option>
@@ -52,7 +64,7 @@
                 <p class="text-red-500 text-xs italic mt-2">{{ $message }}</p>
             @enderror
         </div>
-        
+
         <div class="mb-4">
             <label for="bb_max" class="block text-gray-700">Berat Badan Max</label>
             <input type="number" name="bb_max" id="bb_max" min="45" max="100" x-model="bbMax" @input="updateBb" value="{{ old('bb_max', 100) }}" class="w-full px-3 py-2 border rounded @error('bb_max') border-red-500 @enderror" :disabled="isBeregu()">
@@ -71,7 +83,7 @@
             <p class="text-red-500 text-xs italic mt-2">{{ $message }}</p>
         @enderror
     </div>
-    
+
     <div class="flex justify-end">
         <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Submit</button>
     </div>
