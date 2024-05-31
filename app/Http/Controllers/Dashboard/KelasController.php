@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Kelas;
 use App\Models\List\ListAtletWithKelas;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class KelasController extends Controller
