@@ -40,8 +40,6 @@ class AtletController extends Controller
                 return redirect()->back()->withErrors($validator)->withInput();
             }
 
-            $id_tim = $request->tim_id;
-            $id_kelas = $request->kelas_id;
             $data = $validator->validated();
             $tempatTanggal = $data['tempat'] . ', ' . date('d F Y', strtotime($data['tanggal']));
             $data['ttl'] = $tempatTanggal;
