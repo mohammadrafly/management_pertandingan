@@ -45,7 +45,7 @@ class AtletController extends Controller
         $pembayaran = Pembayaran::where('pertandingan_id', $pertandingan->id)->where('tim_id', $team->id)->first();
 
         if (!$pembayaran) {
-            return redirect()->route('manajer.my.tim')->with('error', 'Tim anda belum mengikuti perrtandingan! Silahkan daftarkan tim anda terlebih dahulu.');
+            return redirect()->route('manajer.pertandingan')->with('error', 'Tim anda belum mengikuti perrtandingan! Silahkan daftarkan tim anda terlebih dahulu.');
         }
 
         return view('pages.dashboard.manajer.atlet.idcard', [

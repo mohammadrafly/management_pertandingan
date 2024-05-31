@@ -10,6 +10,7 @@ use App\Http\Controllers\Dashboard\TimController;
 use App\Http\Controllers\Dashboard\UserController;
 use App\Http\Controllers\Manajer\AtletController as ManajerAtletController;
 use App\Http\Controllers\Manajer\KelasController as ManajerKelasController;
+use App\Http\Controllers\Manajer\PembayaranController as ManajerPembayaranController;
 use App\Http\Controllers\Manajer\PertandinganController as ManajerPertandinganController;
 use App\Http\Controllers\Manajer\TimController as ManajerTimController;
 use App\Http\Controllers\SettingController;
@@ -103,6 +104,11 @@ Route::middleware('auth')->group(function() {
                 Route::prefix('my/tim')->group(function() {
                     Route::controller(ManajerTimController::class)->group(function() {
                         Route::match(['GET', 'POST'], '/', 'index')->name('manajer.my.tim');
+                    });
+                });
+                Route::prefix('my/pembayaran')->group(function() {
+                    Route::controller(ManajerPembayaranController::class)->group(function() {
+                        Route::match(['GET'], '{team}', 'index')->name('manajer.pembayaran');
                     });
                 });
                 Route::prefix('pertandingan')->group(function() {
