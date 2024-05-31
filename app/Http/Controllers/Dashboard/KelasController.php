@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
 use App\Models\Kelas;
+use App\Models\List\ListAtletWithKelas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -15,6 +16,15 @@ class KelasController extends Controller
         return view('pages.dashboard.kelas.index', [
             'title' => 'Data Kelas',
             'data' => Kelas::all(),
+        ]);
+    }
+
+    public function listAtlet($id)
+    {
+        $kelas = Kelas::find($id);
+        return view('pages.dashboard.kelas.list', [
+            'title' => 'List Atlet Dalam '. $kelas->nama,
+            'data' => ListAtletWithKelas::with('listAtletInTeam')->where('kelas_id', $id)->get()
         ]);
     }
 

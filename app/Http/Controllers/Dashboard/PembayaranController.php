@@ -12,7 +12,7 @@ class PembayaranController extends Controller
     {
         return view('pages.dashboard.pembayaran.index', [
             'title' => 'Data Pembayaran',
-            'data' => Pembayaran::all(),
+            'data' => Pembayaran::with('pertandingan', 'team')->get(),
         ]);
     }
 

@@ -54,6 +54,7 @@ Route::middleware('auth')->group(function() {
                     Route::match(['GET', 'POST'], 'create', 'create')->name('kelas.create');
                     Route::match(['GET', 'POST'], 'update/{id}', 'update')->name('kelas.update');
                     Route::match(['GET'], 'delete/{id}', 'delete')->name('kelas.delete');
+                    Route::get('list/atlet/{id}', 'listAtlet')->name('kelas.list.atlet');
                 });
             });
             Route::prefix('pembayaran')->group(function() {

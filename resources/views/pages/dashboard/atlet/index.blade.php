@@ -20,7 +20,7 @@
         <tr>
             <td>{{ $index + 1 }}</td>
             <td>{{ $item->nama }}</td>
-            <td>{{ $item->jk }}</td>
+            <td>{{ $item->jk == 'l' ? 'Laki-laki' : 'Perempuan' }}</td>
             <td>{{ $item->bb }}</td>
             <td>{{ $item->foto }}</td>
             <td>{{ $item->foto_ktp }}</td>
