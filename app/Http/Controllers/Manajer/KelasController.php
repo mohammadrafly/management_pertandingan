@@ -81,31 +81,33 @@ class KelasController extends Controller
 
             $findKelas = Kelas::find($kelas_id);
 
-            $weightRange = explode(' - ', $findKelas->bb);
-            $weightMin = intval($weightRange[0]);
-            $weightMax = intval($weightRange[1]);
+            $isKata = strpos(strtolower($findKelas->name), 'kata') !== false;
 
-            if ($atlet->bb >= $weightMin && $atlet->bb <= $weightMax && $atlet->jk == $findKelas->gender) {
-                $exists = ListAtletWithKelas::where('list_atlet_in_team_id', $atlet_id)
-                            ->where('kelas_id', $kelas_id)
-                            ->exists();
+            if ($isKata || ($atlet->bb >= intval(explode(' - ', $findKelas->bb)[0]) && $atlet->bb <= intval(explode(' - ', $findKelas->bb)[1]))) {
+                if ($atlet->jk == $findKelas->gender) {
+                    $exists = ListAtletWithKelas::where('list_atlet_in_team_id', $atlet_id)
+                                ->where('kelas_id', $kelas_id)
+                                ->exists();
 
-                if ($exists) {
-                    return redirect()->route('manajer.kelas.list', $kelas_id)->with('error', 'Atlet sudah ada di dalam kelas.');
+                    if ($exists) {
+                        return redirect()->route('manajer.kelas.list', $kelas_id)->with('error', 'Atlet sudah ada di dalam kelas.');
+                    }
+
+                    $data = [
+                        'list_atlet_in_team_id' => $atlet_id,
+                        'kelas_id' => $kelas_id
+                    ];
+
+                    $insert = ListAtletWithKelas::create($data);
+
+                    if (!$insert) {
+                        return redirect()->route('manajer.kelas.list', $kelas_id)->with('error', 'Gagal menambahkan atlet ke dalam kelas.');
+                    }
+
+                    return redirect()->route('manajer.kelas.list', $kelas_id)->with('success', 'Berhasil menambahkan atlet ke dalam kelas.');
+                } else {
+                    return redirect()->route('manajer.kelas.list', $kelas_id)->with('error', 'Berat badan atlet tidak sesuai atau memiliki gender yang berbeda dengan kelas.');
                 }
-
-                $data = [
-                    'list_atlet_in_team_id' => $atlet_id,
-                    'kelas_id' => $kelas_id
-                ];
-
-                $insert = ListAtletWithKelas::create($data);
-
-                if (!$insert) {
-                    return redirect()->route('manajer.kelas.list', $kelas_id)->with('error', 'Gagal menambahkan atlet ke dalam kelas.');
-                }
-
-                return redirect()->route('manajer.kelas.list', $kelas_id)->with('success', 'Berhasil menambahkan atlet ke dalam kelas.');
             } else {
                 return redirect()->route('manajer.kelas.list', $kelas_id)->with('error', 'Berat badan atlet tidak sesuai atau memiliki gender yang berbeda dengan kelas.');
             }
