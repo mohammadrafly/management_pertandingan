@@ -27,14 +27,10 @@
             <td>{{ $index + 1 }}</td>
             <td>{{ $item->nama }}</td>
             <td>
-                @if ($item->kategori == 'kata_beregu')
-                    Kata Beregu
-                @elseif ($item->kategori == 'kumite_beregu')
-                    Kumite Beregu
-                @elseif ($item->kategori == 'kata_perorangan')
-                    Kata Perorangan
-                @elseif ($item->kategori == 'kumite_perorangan')
-                    Kumite Perorangan
+                @if ($item->kategori == 'kata')
+                    Kata
+                @elseif ($item->kategori == 'kumite')
+                    Kumite
                 @endif
             </td>
             <td>{{ $item->bb }}</td>

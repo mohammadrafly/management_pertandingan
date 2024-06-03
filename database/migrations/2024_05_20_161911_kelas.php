@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('nama');
             $table->enum('gender', ['p', 'l']);
-            $table->enum('kategori', ['kata_perorangan', 'kata_beregu', 'kumite_perorangan', 'kumite_beregu']);
+            $table->enum('kategori', ['kata', 'kumite']);
             $table->string('bb')->nullable();
             $table->string('img');
             $table->timestamps();

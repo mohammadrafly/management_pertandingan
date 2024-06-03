@@ -4,23 +4,24 @@
 
 <form action="{{ route('kelas.create') }}" method="POST" enctype="multipart/form-data" x-data="{
         kategori: '{{ old('kategori', '') }}',
-        isBeregu() {
-            return this.kategori.includes('beregu');
-        },
+        bbMin: '{{ old('bb_min', '') }}',
+        bbMax: '{{ old('bb_max', '') }}',
         isKata() {
-            return this.kategori.includes('kata');
+            return this.kategori === 'kata';
         },
-        bbMin: '{{ old('bb_min', ) }}',
-        bbMax: '{{ old('bb_max', ) }}',
+        isBeregu() {
+            // You might need to implement logic here if there's a 'beregu' category or condition
+            return false;
+        },
         updateBb() {
-            if (!this.isBeregu() && !this.isKata()) {
+            if (!this.isKata()) {
                 this.bb = this.bbMin + ' - ' + this.bbMax;
             } else {
                 this.bb = '';
             }
         },
         bb: ''
-    }" @submit.prevent="updateBb; $el.submit()">
+    }" @submit="updateBb()">
     @csrf
     <div class="mb-4">
         <label for="nama" class="block text-gray-700">Nama</label>
@@ -43,13 +44,11 @@
     </div>
 
     <div class="mb-4">
-        <label for="kategori" class="block text-gray-700">Tipe Kelas Harga</label>
+        <label for="kategori" class="block text-gray-700">Tipe Kelas</label>
         <select name="kategori" id="kategori" x-model="kategori" class="w-full px-3 py-2 border rounded @error('kategori') border-red-500 @enderror">
             <option value="">Pilih Kategori</option>
-            <option value="kata_perorangan" {{ old('kategori') == 'kata_perorangan' ? 'selected' : ''}}>Kata Perorangan</option>
-            <option value="kata_beregu" {{ old('kategori') == 'kata_beregu' ? 'selected' : ''}}>Kata Beregu</option>
-            <option value="kumite_perorangan" {{ old('kategori') == 'kumite_perorangan' ? 'selected' : ''}}>Kumite Perorangan</option>
-            <option value="kumite_beregu" {{ old('kategori') == 'kumite_beregu' ? 'selected' : ''}}>Kumite Beregu</option>
+            <option value="kata" {{ old('kategori') == 'kata' ? 'selected' : ''}}>Kata</option>
+            <option value="kumite" {{ old('kategori') == 'kumite' ? 'selected' : ''}}>Kumite</option>
         </select>
         @error('kategori')
             <p class="text-red-500 text-xs italic mt-2">{{ $message }}</p>
