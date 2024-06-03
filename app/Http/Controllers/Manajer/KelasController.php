@@ -81,7 +81,7 @@ class KelasController extends Controller
 
             $findKelas = Kelas::find($kelas_id);
 
-            $isKata = strpos(strtolower($findKelas->name), 'kata') !== false;
+            $isKata = strpos(strtolower($findKelas->name), 'kata');
 
             if ($isKata && $atlet->jk == $findKelas->gender) {
                 $exists = ListAtletWithKelas::where('list_atlet_in_team_id', $atlet_id)
