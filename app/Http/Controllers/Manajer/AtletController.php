@@ -42,6 +42,11 @@ class AtletController extends Controller
         $dataManager = Tim::with('user')->where('manager', Auth::id())->first();
 
         $pertandingan = Pertandingan::orderBy('dimulai', 'desc')->first();
+
+        if (!$pertandingan) {
+            return redirect()->route('dashboard')->with('error', 'Pertandingan tidak tersedia saat ini.');
+        }
+
         $pembayaran = Pembayaran::where('pertandingan_id', $pertandingan->id)->where('tim_id', $team->id)->first();
 
         if (!$pembayaran) {

@@ -21,6 +21,10 @@ class PertandinganController extends Controller
         $team = Tim::where('manager', Auth::id())->first();
         $latestPertandingan = Pertandingan::latest()->first();
 
+        if (!$latestPertandingan) {
+            return redirect()->route('dashboard')->with('error', 'Pertandingan tidak tersedia saat ini.');
+        }
+
         if ($latestPertandingan) {
             $pembayaranSaatIni = Pembayaran::where('pertandingan_id', $latestPertandingan->id)->where('tim_id', $team->id)->first();
 

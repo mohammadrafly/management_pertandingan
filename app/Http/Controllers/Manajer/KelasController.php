@@ -18,9 +18,15 @@ class KelasController extends Controller
 {
     public function index()
     {
+        $kelas = Kelas::all();
+
+        if ($kelas->isEmpty()) {
+            return redirect()->route('dashboard')->with('error', 'Belum ada kelas yang tersedia saat ini.');
+        }
+
         return view('pages.dashboard.manajer.kelas.index', [
             'title' => 'Kelas',
-            'data' => Kelas::all(),
+            'data' => $kelas,
         ]);
     }
 
