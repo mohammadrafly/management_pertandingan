@@ -26,11 +26,11 @@ class IndexController extends Controller
             ->groupBy('kelas_id')
             ->get()
             ->mapWithKeys(function ($item) {
+                // dd($item->kelas->nama);
                 return [$item->kelas->nama => $item->total];
             })
             ->toArray();
-
-
+        // dd($atletCountByKelas);
         $totalTimInPertandingan = ListTimInPertandingan::with('pertandingan')->select('pertandingan_id', DB::raw('count(*) as total'))
             ->groupBy('pertandingan_id')
             ->get()
