@@ -1,5 +1,5 @@
 <div class="bg-[#cb1a29] min-w-[300px]"
-    x-show="open"
+    x-show="!open"
     x-transition:enter="transition-transform ease-out duration-300 transform"
     x-transition:enter-start="translate-x-[-250px]"
     x-transition:enter-end="translate-x-0"
