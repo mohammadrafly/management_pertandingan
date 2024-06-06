@@ -21,7 +21,7 @@
                 <h1 class="text-[#3d3d5c] font-semibold text-xl">{{ $title }}</h1>
                 @yield('tambah')
             </div>
-            <div class="bg-white p-5 mt-5">
+            <div class="bg-white lg:p-5 mt-5 ">
                 @yield('content')
             </div>
             @yield('second-content')

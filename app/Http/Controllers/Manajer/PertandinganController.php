@@ -20,31 +20,32 @@ class PertandinganController extends Controller
     {
         $team = Tim::where('manager', Auth::id())->first();
         $latestPertandingan = Pertandingan::latest()->first();
-
+    
+        if (!$team) {
+            return redirect()->route('dashboard')->with('error', 'Anda belum memiliki tim terdaftar.');
+        }
         if (!$latestPertandingan) {
             return redirect()->route('dashboard')->with('error', 'Pertandingan tidak tersedia saat ini.');
         }
-
-        if ($latestPertandingan) {
-            $pembayaranSaatIni = Pembayaran::where('pertandingan_id', $latestPertandingan->id)->where('tim_id', $team->id)->first();
-
-            if (!$pembayaranSaatIni) {
-                $pembayaranSaatIni = null;
-            }
-        } else {
-            $pembayaranSaatIni = null;
-        }
-
+    
+        $pembayaranSaatIni = Pembayaran::where('pertandingan_id', $latestPertandingan->id)
+            ->where('tim_id', $team->id)
+            ->first();
+    
         $joinedPertandingan = ListTimInPertandingan::with('pertandingan')
             ->where('pertandingan_id', $latestPertandingan->id)
             ->where('tim_id', $team->id)
             ->where('status', 'active')
             ->first();
-
-        if (!$joinedPertandingan) {
-            $joinedPertandingan = null;
-        }
-
+    
+        $atlets = ListAtletWithKelas::with(['listAtletInTeam' => function($query) use ($team) {
+            $query->where('tim_id', $team->id);
+        }])
+        ->whereHas('listAtletInTeam', function($query) use ($team) {
+            $query->where('tim_id', $team->id);
+        })
+        ->get();
+    
         return view('pages.dashboard.manajer.pertandingan.index', [
             'title' => 'Pertandingan',
             'pembayaran' => Pembayaran::with('team', 'pertandingan')
@@ -57,54 +58,61 @@ class PertandinganController extends Controller
             'team_id' => $team->id,
             'pembayaran_saat_ini' => $pembayaranSaatIni,
             'joined_pertandingan' => $joinedPertandingan,
+            'atlet' => $atlets
         ]);
     }
-
+    
     public function daftarPertandingan($idPertandingan, $idTeam)
-    {
-        $existingEntry = ListTimInPertandingan::where('pertandingan_id', $idPertandingan)
-            ->where('tim_id', $idTeam)
-            ->first();
+{
+    // Check if the team has any athletes
+    $atletsCount = ListAtletWithKelas::with(['listAtletInTeam' => function($query) use ($idTeam) {
+        $query->where('tim_id', $idTeam);
+    }])
+    ->whereHas('listAtletInTeam', function($query) use ($idTeam) {
+        $query->where('tim_id', $idTeam);
+    })
+    ->count();
 
-        if ($existingEntry) {
-            return redirect()->route('manajer.pertandingan')->with('error', 'Tim sudah terdaftar untuk pertandingan ini.');
-        }
+    if ($atletsCount == 0) {
+        return redirect()->route('manajer.pertandingan')->with('error', 'Anda harus memiliki atlet untuk mendaftar pertandingan.');
+    }
 
-        $create = ListTimInPertandingan::create([
+    $existingEntry = ListTimInPertandingan::where('pertandingan_id', $idPertandingan)
+        ->where('tim_id', $idTeam)
+        ->first();
+
+    if ($existingEntry) {
+        return redirect()->route('manajer.pertandingan')->with('error', 'Tim sudah terdaftar untuk pertandingan ini.');
+    }
+
+    $create = ListTimInPertandingan::create([
+        'pertandingan_id' => $idPertandingan,
+        'tim_id' => $idTeam,
+        'status' => 'inactive'
+    ]);
+
+    if ($create) {
+        $hargaPerAtlet = Setting::where('type', 'pembayaran_atlet')->first();
+        $hargaPerTim = Setting::where('type', 'pembayaran_tim')->first();
+        $totalTagihanAtlets = $atletsCount * $hargaPerAtlet->harga;
+        $total = $totalTagihanAtlets + $hargaPerTim->harga;
+
+        $kodePembayaran = $this->generateKodePembayaran();
+
+        Pembayaran::create([
             'pertandingan_id' => $idPertandingan,
             'tim_id' => $idTeam,
-            'status' => 'inactive'
+            'total' => $total,
+            'status' => '0',
+            'kode_pembayaran' => $kodePembayaran
         ]);
 
-        if ($create) {
-            $atlets = ListAtletWithKelas::with(['listAtletInTeam' => function($query) use ($idTeam) {
-                        $query->where('tim_id', $idTeam);
-                    }])
-                    ->whereHas('listAtletInTeam', function($query) use ($idTeam) {
-                        $query->where('tim_id', $idTeam);
-                    })
-                    ->count();
-
-            $hargaPerAtlet = Setting::where('type', 'pembayaran_atlet')->first();
-            $hargaPerTim = Setting::where('type', 'pembayaran_tim')->first();
-            $totalTagihanAtlets = $atlets * $hargaPerAtlet->harga;
-            $total = $totalTagihanAtlets + $hargaPerTim->harga;
-
-            $kodePembayaran = $this->generateKodePembayaran();
-
-            Pembayaran::create([
-                'pertandingan_id' => $idPertandingan,
-                'tim_id' => $idTeam,
-                'total' => $total,
-                'status' => '0',
-                'kode_pembayaran' => $kodePembayaran
-            ]);
-
-            return redirect()->route('manajer.pertandingan')->with('success', 'Berhasil daftar!');
-        } else {
-            return redirect()->route('manajer.pertandingan')->with('errorr', 'Gagal daftar!');
-        }
+        return redirect()->route('manajer.pertandingan')->with('success', 'Berhasil daftar!');
+    } else {
+        return redirect()->route('manajer.pertandingan')->with('error', 'Gagal daftar!');
     }
+}
+
 
     private function generateKodePembayaran()
     {

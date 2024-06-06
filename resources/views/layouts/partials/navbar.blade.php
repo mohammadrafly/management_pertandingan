@@ -1,5 +1,5 @@
 <div class="bg-white flex justify-between items-center w-full">
-    <div class="max-w-[300px] flex justify-between items-center px-5">
+    <div class="max-w-[300px] justify-between items-center px-5 hidden lg:flex">
         <img src="{{ asset('images/logo.png')}}" alt="" class="size-12 mr-2">
         <div class="items-center font-bold text-xl text-[#3d3d5c]">
             <a href="{{ route('dashboard')}}">{{ env('APP_NAME')}}</a>

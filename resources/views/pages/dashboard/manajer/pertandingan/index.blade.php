@@ -4,7 +4,7 @@
 @php
     use Akaunting\Money\Money;
 @endphp
-<div class="grid grid-cols-2 gap-10">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
     <div class="bg-sky-100 p-5 rounded shadow-lg items-center flex justify-between">
         <div>
             {{ $pertandingan->pertandingan }}
@@ -12,9 +12,13 @@
         <div>
             @if ($joined_pertandingan == null)
                 @if ($pembayaran_saat_ini != null && $pembayaran_saat_ini->status == '0')
-                <a href="#" class="uppercase bg-gray-500 hover:bg-gray-600 cursor-not-allowed text-white py-2 px-3 rounded font-semibold">Daftar</a>
+                    <a href="#" class="uppercase bg-gray-500 hover:bg-gray-600 cursor-not-allowed text-white py-2 px-3 rounded font-semibold">Daftar</a>
                 @else
-                <a href="{{ route('manajer.pertandingan.daftar', ['pertandingan' => $pertandingan->id, 'team' => $team_id])}}" class="uppercase bg-blue-500 hover:bg-blue-600 text-white py-2 px-3 rounded font-semibold">Daftar</a>
+                    @if ($atlet->isEmpty())
+                        <a href="#" class="uppercase bg-gray-500 hover:bg-gray-600 cursor-not-allowed text-white py-2 px-3 rounded font-semibold" title="Tambahkan atlet terlebih dahulu">Daftar</a>
+                    @else
+                        <a href="{{ route('manajer.pertandingan.daftar', ['pertandingan' => $pertandingan->id, 'team' => $team_id])}}" class="daftar-button uppercase bg-blue-500 hover:bg-blue-600 text-white py-2 px-3 rounded font-semibold">Daftar</a>
+                    @endif
                 @endif
             @else
                 <div x-data="countdownTimer('{{ $countdown->dimulai ?? '' }}')" x-init="init()" class="text-center">
@@ -27,8 +31,10 @@
         <div>
             @if ($pembayaran_saat_ini && $pembayaran_saat_ini->status == '0')
                 Tagihan {{ Money::IDR($pembayaran_saat_ini->total, true) }}
+            @elseif ($atlet->isEmpty())
+                Tambahkan atlet ke dalam kelas terlebih dahulu
             @elseif (!$pembayaran_saat_ini)
-                Silahkan daftar pertandingan terlebih dahulu.
+                Silahkan daftar pertandingan
             @elseif ($pembayaran_saat_ini && $pembayaran_saat_ini->status == '1')
                 Tidak ada tagihan! siapkan atlet anda untuk berkompetisi!
             @endif
@@ -57,7 +63,6 @@
                 </tr>
             </thead>
             <tbody>
-
                 @foreach ($pembayaran as $item)
                 <tr class="transition duration-300 hover:bg-gray-200">
                     <td class="py-2 px-2">{{ $item->created_at }}</td>
@@ -84,7 +89,7 @@
 
 @section('script')
 <script>
-     $(document).ready(function() {
+    $(document).ready(function() {
         $('#payButton').click(function() {
             handlePayment();
         });
@@ -133,6 +138,15 @@
                 }
             });
         }
+
+        // Confirmation popup for registration
+        $('.daftar-button').click(function(event) {
+            event.preventDefault();
+            var url = $(this).attr('href');
+            if (confirm('Apakah Anda yakin ingin mendaftar untuk pertandingan ini?')) {
+                window.location.href = url;
+            }
+        });
     });
 
     function countdownTimer(startTime) {
