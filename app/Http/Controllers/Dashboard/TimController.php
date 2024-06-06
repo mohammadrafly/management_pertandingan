@@ -3,9 +3,13 @@
 namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
+use App\Models\List\ListAtletInTeam;
+use App\Models\List\ListTimInPertandingan;
+use App\Models\Pembayaran;
 use App\Models\Tim;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class TimController extends Controller
@@ -76,27 +80,50 @@ class TimController extends Controller
             return redirect()->route('tim')->with('error', 'Tim not found!');
         }
 
-        $imagePath = $tim->foto;
-        $documentPath = $tim->surat_tugas;
-
-        if ($imagePath) {
-            $fullImagePath = storage_path('app/public/foto_tim/' . $imagePath);
-            if (file_exists($fullImagePath)) {
-                unlink($fullImagePath);
+        DB::beginTransaction();
+        try {
+            // Delete related records in list_atlet_with_kelas via list_atlet_in_team
+            $listAtletInTeams = ListAtletInTeam::where('tim_id', $tim->id)->get();
+            foreach ($listAtletInTeams as $listAtletInTeam) {
+                $listAtletInTeam->listAtletWithKelas()->delete();
             }
-        }
 
-        if ($documentPath) {
-            $fullDocumentPath = storage_path('app/public/surat_tugas/' . $documentPath);
-            if (file_exists($fullDocumentPath)) {
-                unlink($fullDocumentPath);
+            // Delete related records in list_atlet_in_team
+            ListAtletInTeam::where('tim_id', $tim->id)->delete();
+
+            // Delete related records in list_tim_in_pertandingan
+            ListTimInPertandingan::where('tim_id', $tim->id)->delete();
+
+            // Delete related records in pembayaran
+            Pembayaran::where('tim_id', $tim->id)->delete();
+
+            // Delete team photo
+            $imagePath = $tim->foto;
+            if ($imagePath) {
+                $fullImagePath = storage_path('app/public/foto_tim/' . $imagePath);
+                if (file_exists($fullImagePath)) {
+                    unlink($fullImagePath);
+                }
             }
-        }
 
-        if (!$tim->delete()) {
+            // Delete team assignment letter
+            $documentPath = $tim->surat_tugas;
+            if ($documentPath) {
+                $fullDocumentPath = storage_path('app/public/surat_tugas/' . $documentPath);
+                if (file_exists($fullDocumentPath)) {
+                    unlink($fullDocumentPath);
+                }
+            }
+
+            // Delete the team
+            $tim->delete();
+
+            DB::commit();
+
+            return redirect()->route('tim')->with('success', 'Success delete tim!');
+        } catch (\Exception $e) {
+            DB::rollBack();
             return redirect()->route('tim')->with('error', 'Gagal delete tim!');
         }
-
-        return redirect()->route('tim')->with('success', 'Success delete tim!');
     }
 }

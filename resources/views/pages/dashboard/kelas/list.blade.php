@@ -1,6 +1,5 @@
 @extends('layouts.app')
 
-
 @section('content')
 
 <table id="table" class="w-full display compact">
@@ -15,8 +14,8 @@
         @foreach ($data as $index => $item)
         <tr>
             <td>{{ $index + 1 }}</td>
-            <td>{{ $item->listAtletInTeam->atlet->nama}}</td>
-            <td>{{ $item->listAtletInTeam->team->nama }}</td>
+            <td>{{ optional(optional($item->listAtletInTeam)->atlet)->nama ?? 'N/A' }}</td>
+            <td>{{ optional(optional($item->listAtletInTeam)->team)->nama ?? 'N/A' }}</td>
         </tr>
         @endforeach
     </tbody>
