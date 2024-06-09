@@ -5,11 +5,11 @@
     use Akaunting\Money\Money;
 @endphp
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-    <div class="bg-sky-100 p-5 rounded shadow-lg items-center flex justify-between">
+    <div class="bg-sky-100 p-5 rounded shadow-lg items-center flex justify-between flex-col lg:flex-row">
         <div>
             {{ $pertandingan->pertandingan }}
         </div>
-        <div>
+        <div class="mt-3 lg:mt-0">
             @if ($joined_pertandingan == null)
                 @if ($pembayaran_saat_ini != null && $pembayaran_saat_ini->status == '0')
                     <a href="#" class="uppercase bg-gray-500 hover:bg-gray-600 cursor-not-allowed text-white py-2 px-3 rounded font-semibold">Daftar</a>
@@ -27,7 +27,7 @@
             @endif
         </div>
     </div>
-    <div class="bg-sky-100 p-5 rounded shadow-lg flex justify-between items-center">
+    <div class="bg-sky-100 p-5 rounded shadow-lg flex justify-between items-center flex-col lg:flex-row">
         <div>
             @if ($pembayaran_saat_ini && $pembayaran_saat_ini->status == '0')
                 Tagihan {{ Money::IDR($pembayaran_saat_ini->total, true) }}
@@ -39,11 +39,9 @@
                 Tidak ada tagihan! siapkan atlet anda untuk berkompetisi!
             @endif
         </div>
-        <div>
+        <div class="mt-3 lg:mt-0">
             @if ($pembayaran_saat_ini && $pembayaran_saat_ini->status == '0')
                 <button id="payButton" class="uppercase bg-blue-500 hover:bg-blue-600 text-white py-2 px-3 rounded font-semibold">Bayar</button>
-            @elseif (!$pembayaran_saat_ini)
-
             @endif
         </div>
     </div>
@@ -51,9 +49,9 @@
 
 <div class="py-10">
     <div>
-        <h1 class="mb-5">History Pembayaran</h1>
+        <h1 class="mb-5 text-lg font-semibold">History Pembayaran</h1>
 
-        <table class="w-full shadow-md">
+        <table class="w-full shadow-md display responsive min-w-full">
             <thead class="text-left bg-sky-500">
                 <tr class="text-white">
                     <th class="py-2 px-2">Tanggal</th>
@@ -66,11 +64,11 @@
                 @foreach ($pembayaran as $item)
                 <tr class="transition duration-300 hover:bg-gray-200">
                     <td class="py-2 px-2">{{ $item->created_at }}</td>
-                    <td class="py-2 px-2">{{ $item->pertandingan->pertandingan}}</td>
+                    <td class="py-2 px-2">{{ $item->pertandingan->pertandingan }}</td>
                     <td class="py-2 px-2">{{ Money::IDR($item->total, true) }}</td>
                     <td class="py-2 px-2">
-                        <span class="{{ $item->status === '1' ? 'bg-green-500' : 'bg-red-500'}} rounded py-1 px-3 text-white uppercase">
-                            {{ $item->status === '1' ? 'Berhasil' : 'Gagal'}}
+                        <span class="{{ $item->status === '1' ? 'bg-green-500' : 'bg-red-500' }} rounded py-1 px-3 text-white uppercase">
+                            {{ $item->status === '1' ? 'Berhasil' : 'Gagal' }}
                         </span>
                     </td>
                 </tr>
@@ -78,7 +76,7 @@
             </tbody>
         </table>
         <div class="flex justify-center items-center my-4">
-            <a href="{{ route('manajer.pembayaran', $team_id)}}" class="text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-md shadow-md transition duration-300">
+            <a href="{{ route('manajer.pembayaran', $team_id) }}" class="text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-md shadow-md transition duration-300">
                 Lihat Semua
             </a>
         </div>
@@ -156,7 +154,6 @@
                 const targetDate = new Date(startTime);
                 this.updateTime(targetDate);
 
-                console.log(startTime)
                 setInterval(() => {
                     this.updateTime(targetDate);
                 }, 1000);

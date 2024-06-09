@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
 use App\Models\Atlet;
+use App\Models\List\ListAtletInTeam;
 use App\Models\List\ListAtletWithKelas as ListListAtletWithKelas;
 use App\Models\List\ListTimInPertandingan;
+use App\Models\Pembayaran;
 use App\Models\Pertandingan;
 use App\Models\Tim;
 use App\Models\User;
@@ -21,6 +23,26 @@ class IndexController extends Controller
     public function index()
     {
         $latestPertandingan = Pertandingan::orderBy('dimulai', 'desc')->first();
+        $team = Tim::where('manager', Auth::user()->id)->first();
+        // dd(Auth::user()->id);
+        if (Auth::user()->role != 'admin') {
+            $totalAtletPerTeam = ListAtletInTeam::where('tim_id', $team->id)->count(); //total atlet per team
+            
+            $teamRegistered = ListTimInPertandingan::where('pertandingan_id', $latestPertandingan->id)
+            ->where('tim_id', $team->id)
+            ->exists();
+
+            $latestPaymentStatus = Pembayaran::where('tim_id', $team->id)
+            ->where('pertandingan_id', $latestPertandingan->id ?? 0)
+            ->orderBy('created_at', 'desc')
+            ->first();
+            $paymentStatus = $latestPaymentStatus ? $latestPaymentStatus->status : null;
+
+            if (!$team) {
+                return redirect()->route('my.tim')->with('error', 'Anda tidak memiliki tim! Silahkan daftarkan tim anda terlebih dahulu.');
+            }
+        }
+        
         $atletCountByKelas = ListListAtletWithKelas::with('kelas')
             ->select('kelas_id', DB::raw('count(*) as total'))
             ->groupBy('kelas_id')
@@ -48,6 +70,10 @@ class IndexController extends Controller
             'totalTim' => Tim::count(),
             'totalAtletPerKelas' => $atletCountByKelas,
             'totalTimInPertandingan' => $totalTimInPertandingan,
+            'team_id' => $team->id ?? null,
+            'teamRegistered' => $teamRegistered ?? null,// Pass the registration status
+            'totalAtletPerTeam' => $totalAtletPerTeam ?? null,
+            'paymentStatus'=> $paymentStatus ?? null
         ]);
     }
 

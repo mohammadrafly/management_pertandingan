@@ -13,8 +13,8 @@
         @enderror
     </div>
 
-    <div class="mb-4 flex gap-5">
-        <div class="w-full">
+    <div class="mb-4 md:flex md:gap-5">
+        <div class="w-full mb-4 md:mb-0">
             <label for="tempat" class="block text-gray-700">Tempat Lahir</label>
             @php
                 $tempat = explode(',', old('tempat') ?? $data->ttl)[0];
@@ -36,8 +36,8 @@
         </div>
     </div>
 
-    <div class="mb-4 flex gap-5">
-        <div class="w-full">
+    <div class="mb-4 md:flex md:gap-5">
+        <div class="w-full mb-4 md:mb-0">
             <label for="jk" class="block text-gray-700">Jenis Kelamin</label>
             <select name="jk" id="jk" class="w-full px-3 py-2 border rounded @error('jk') border-red-500 @enderror">
                 <option value="">Pilih Jenis Kelamin</option>
@@ -57,8 +57,8 @@
         </div>
     </div>
 
-    <div class="mb-4 flex gap-5">
-        <div class="w-full">
+    <div class="mb-4 md:flex md:gap-5">
+        <div class="w-full mb-4 md:mb-0">
             <label for="foto" class="block text-gray-700">Foto</label>
             <input type="file" name="foto" id="foto" class="w-full px-3 py-2 border rounded @error('foto') border-red-500 @enderror">
             @if ($data && $data->foto)
@@ -88,8 +88,8 @@
         <label for="ijazah_karate" class="block text-gray-700">Ijazah Karate</label>
         <input type="file" name="ijazah_karate" id="ijazah_karate" class="w-full px-3 py-2 border rounded @error('ijazah_karate') border-red-500 @enderror">
         @if ($data && $data->ijazah_karate)
-            <div class="mt-2 w-fit h-fit">
-                <iframe src="{{ asset('storage/ijazah_karate/' . $data->ijazah_karate) }}" width="100%" height="500px"></iframe>
+            <div class="mt-2 w-full h-96">
+                <iframe src="{{ asset('storage/ijazah_karate/' . $data->ijazah_karate) }}" width="100%" height="100%" class="border rounded"></iframe>
             </div>
         @endif
         @error('ijazah_karate')

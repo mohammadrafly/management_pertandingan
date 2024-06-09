@@ -34,7 +34,7 @@
     </div>
     @endforeach
 </div>
-<div>
+<div class="mt-10"> <!-- Added margin-top here -->
     <div id="id-card-content-manager" class="bg-white shadow-lg rounded-lg max-w-[620px] max-h-[900px]">
         <div class="bg-[#cb1a29] rounded-t-lg flex justify-center items-center py-32 p-10">
             <div>
